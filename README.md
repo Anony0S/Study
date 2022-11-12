@@ -1,24 +1,13 @@
-# demo
-
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+# 组件封装
+│  App.vue
+│  main.js
+│
+├─assets
+│      logo.png     
+│
+├─components        
+│      imgReduce.vue  // 图片压缩
+│      upload.vue   // 对上传图片进行大小，尺寸，类型限制
+│
+└─views
+        home.vue  
