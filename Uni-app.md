@@ -21,6 +21,21 @@
 
 - **注意：**如果是在组件中，`onLoad()、onUnload()`等小程序的生命周期不起作用，但是可以使用`creat()、beforeDestroy()`，所以注意不能用`onLoad()`接收参数实现页面间的传值，但是可以使用**页面通讯（全局事件总线），**`vuex`等方法进行传值
 
+- 若要**绑定样式**，可使用计算属性，直接绑定不生效
+
+  - <img src="C:\Users\Admin\Documents\Typora\Uni-app.assets\image-20221129132953049.png" alt="image-20221129132953049" style="zoom:200%;" />
+
+  - 解决方法一：使用计算属性
+
+    ![image-20221129133536696](C:\Users\Admin\Documents\Typora\Uni-app.assets\image-20221129133536696.png)
+
+  - 解决方法二：使用数组写法（colorUI案例）
+
+    ![image-20221129135756042](C:\Users\Admin\Documents\Typora\Uni-app.assets\image-20221129135756042.png)
+
+    
+
+
 ## 页面传值
 
 ### 父子通讯
@@ -58,6 +73,7 @@
     ```js
     // 子页面
     onLoad() {
+        const eventChannel = this.getOpenerEventChannel();
         //监听acceptDataFromOpenerPage事件，获取上一页面通过eventChannel传送到当前页面的数据
         eventChannel.on('acceptDataFromOpenerPage', function(data) {
         	console.log(data)
@@ -83,3 +99,10 @@
 - 此方法可以跨任意组件、页面等
 - **注意**在`onLoad()`里面使用`uni.$on`注册监听，在`onUnload()`里边使用`uni.$off`移除
 
+
+
+## 背景图片的设置
+
+- 微信小程序无法直接使用本地图片，uni-app会转换为`Base64`格式
+- 可以使用行内样式，uni-app不会进行转换
+- 使用网络图片
