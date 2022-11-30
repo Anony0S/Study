@@ -106,3 +106,22 @@
 - 微信小程序无法直接使用本地图片，uni-app会转换为`Base64`格式
 - 可以使用行内样式，uni-app不会进行转换
 - 使用网络图片
+
+
+
+## `border-image`设置渐变边框
+
+```css
+div {
+  border: 4px solid;
+  border-image: linear-gradient(to right, #8f41e9, #578aef) 1;
+}
+```
+
+
+
+## 根据背景颜色设置字体颜色
+
+[如何根据背景颜色动态修改文字颜色（掘金）](https://juejin.cn/post/6844903960487149582)
+
+[使用CSS完成效果](https://www.cnblogs.com/coco1s/p/16012545.html)
