@@ -221,3 +221,38 @@ if (to.matched.length === 0) {  //如果未匹配到路由
 ## 高德地图API
 
 - 使用搜索等业务时，注意使用web服务API，否则不会报错也不会生效
+
+
+
+## 图标选择组件 
+
+[e-icon-picker](https://www.npmjs.com/package/e-icon-picker)
+
+
+
+## vue项目中使用`Animate.css`
+
+[参考文档](https://www.cnblogs.com/suwanbin/p/13200296.html)
+
+1. 安装 `npm i animate.css`
+
+2. `main.js` 中使用
+
+   ```js
+   import animated from 'animate.css'
+   Vue.use(animated)
+   ```
+
+3. 页面中使用
+
+   ```vue
+   vue模板中：
+   <div class="ty">
+       <!-- animate__animated 这个类属性是必须加的，应用的动画类也需要加上 animate__ 前缀 -->
+       <div class="box animate__animated animate__bounceInLeft"></div>
+   </div>
+   ```
+
+4. 注意：可以在[Animate.css官网](https://animate.style/)找到动画
+
+   进阶用法：[使用Vue中的transition标签](https://juejin.cn/post/6844904106432135175)
