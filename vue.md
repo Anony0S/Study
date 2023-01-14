@@ -256,3 +256,67 @@ if (to.matched.length === 0) {  //如果未匹配到路由
 4. 注意：可以在[Animate.css官网](https://animate.style/)找到动画
 
    进阶用法：[使用Vue中的transition标签](https://juejin.cn/post/6844904106432135175)
+
+5. 另一种方案
+
+   ```vue
+   <transition
+       appear
+       name="animate__animated animate__bounce"
+       :enter-active-class="`animate__slideInUp`"
+       :leave-active-class="`animate__slideOutDown`"
+       :duration="{ enter: 500, leave: 1000 }"
+   >
+       内容
+   </transition>
+   ```
+
+6. 页面跳转使用动画
+
+   ```vue
+   <template>
+   	<div>
+   		<transition
+   			appear
+   			name="animate__animated animate__bounce"
+   			:enter-active-class="`animate__${right} animate__faster`"
+   			:leave-active-class="`animate__${left} animate__faster`"
+   		>
+   			<router-view class="routee"></router-view>
+   		</transition>
+   	</div>
+   </template>
+   
+   <script>
+   export default {
+   	name: "App",
+   	data() {
+   		return {
+   			right: "fadeInRight",
+   			left: "fadeOutLeft",
+   		};
+   	},
+   	watch: {
+   		$route(to, from) {
+   			if (to.meta.index > from.meta.index) {
+   				this.right = "fadeInRight";
+   				this.left = "fadeOutLeft";
+   			} else {
+   				this.right = "fadeInLeft";
+   				this.left = "fadeOutRight";
+   			}
+   		},
+   	},
+   };
+   </script>
+   
+   <style lang="less">
+   .routee {
+   	position: absolute;
+   	width: 100%;
+   	height: 100%;
+   }
+   </style>
+   ```
+
+   

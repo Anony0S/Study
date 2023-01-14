@@ -13,3 +13,24 @@
   ```
 
   
+
+## 正则判断字符串是否为 Base64 格式 | 加密 | 解密
+
+```js
+function isBase64(str) {
+	if (str === "" || str.trim() === "") {
+		return false;
+	}
+	try {
+		const encrypt = Buffer.from(str).toString("base64") 
+		const decode = Buffer.from(encrypt, 'base64').toString()
+		// return decode == str;
+		const exg = new RegExp('^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$');
+		return exg.test(str)
+
+	} catch (err) {
+		return false;
+	}
+}
+```
+
