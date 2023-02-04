@@ -444,3 +444,70 @@ if (to.matched.length === 0) {  //如果未匹配到路由
 >  [一个项目小亮点---图片压缩上传](https://juejin.cn/post/7081619017365979149)
 >
 >  [[1.3万字]玩转前端二进制](https://juejin.cn/post/6846687590783909902)
+
+
+
+## config配置
+
+```js
+const path = require('path');
+module.exports = {
+  // 部署应用时的基本 URL
+  publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
+  // build时构建文件的目录 构建时传入 --no-clean 可关闭该行为
+  outputDir:'dist',
+  // build时放置生成的静态资源 (js、css、img、fonts) 的 (相对于 outputDir 的) 目录
+  assetsDir:'static',
+  lintOnSave:false,  // 关闭eslint
+  productionSourceMap:false,//不出现map打包
+  devServer:{
+    //host:'localhost',
+    port:6860,
+    // port:8080,
+    open: true, //配置自动启动浏览器
+    // proxy:{
+    //   '/api':{//遇见api1前缀的请求就会触发该代理配置
+    //     target:'https://dygc.worldmaipu.com',//转发的目标地址线上
+    //     // target:'http://192.168.1.234:6860',//转发的目标地址线上
+    //     changeOrigin:true,//支持跨域，如果协议/主机也不相同，必须加上
+    //     //重写请求路径
+    //     pathRewrite:{
+    //       '^/api':''
+    //     }
+    //   }
+    // }
+    disableHostCheck: true, //关闭hostname检查
+   },
+  configureWebpack:{  // 覆盖webpack默认配置的都在这里
+    resolve:{   // 配置解析别名
+        alias:{
+            '@':path.resolve(__dirname, './src'),
+            '@s':path.resolve(__dirname, './src/assets/css'),
+            '@i':path.resolve(__dirname, './src/assets/images'),
+        } 
+    }
+  }
+}
+```
+
+
+## 打包分析工具
+
+1. 安装`webpack`和`webpack-cli`
+
+2. 安装插件
+
+```js
+npm install --save-dev webpack-bundle-analyzer
+```
+
+```js
+// vue.config.js
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+module.exports = {
+  plugins: [
+    new BundleAnalyzerPlugin()
+  ]
+}
+```
