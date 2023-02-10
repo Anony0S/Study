@@ -1,6 +1,6 @@
 ## 获取元素的高度
 
-> 思路：通过`ref`拿到真是`DOM`元素进行获取
+> 思路：通过`ref`拿到真实`DOM`元素进行获取
 
 ```js
 <div ref="getheight"></div>
@@ -511,3 +511,27 @@ module.exports = {
   ]
 }
 ```
+
+
+
+## 音频相关（视频类似）
+
+> 参考文章：
+>
+> [记一次vue中获取audio媒体总时长duration遇到的问题](https://blog.csdn.net/qq_37124515/article/details/106406242)
+>
+> [MDN HTMLMediaElement](https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLMediaElement)
+>
+> [HTMLAudioElement](https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLAudioElement)
+
+
+
+## 打包之后打开dist->index报错
+
+```js
+// vue.config.js
+module.exports = {
+	publicPath: './',    
+}
+```
+
