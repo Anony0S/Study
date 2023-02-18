@@ -533,5 +533,44 @@ module.exports = {
 module.exports = {
 	publicPath: './',    
 }
+
+// vite.config.js
+module.exports = {
+	base: './',    
+}
 ```
 
+
+
+## Vue使用`ECharts`
+
+1. **方式一：**使用`Vue-ECharts`
+
+   - 高于`Vue 2.7.0`版本引入
+
+     - [Github地址](npm install echarts vue-echarts)
+
+     - ```shell
+       npm install echarts vue-echarts
+       ```
+
+   - 低于`Vue 2.7.0`版本引入  
+     - 先安装`@vue/composition-api`：`npm install @vue/composition-api`
+
+     - 注册插件：
+     
+       ```js
+       import Vue from 'vue'
+       import VueCompositionAPI from '@vue/composition-api'
+       
+       Vue.use(VueCompositionAPI)
+       ```
+       
+     - 然后按照正常方式引入即可使用
+    - 参考文档
+      - [Vue-ECharts GitHub](https://github.com/ecomfe/vue-echarts/blob/main/README.zh-Hans.md)
+      - [在Vue2项目中使用@vue/composition-api](https://juejin.cn/post/6966813426291048455)
+
+2. **方式二：**原生ECharts引入  
+
+   直接按照官网引入即可：https://echarts.apache.org/handbook/zh/basics/import/
