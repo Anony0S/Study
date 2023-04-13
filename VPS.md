@@ -117,7 +117,13 @@ bash <(curl -Lso- https://git.io/superspeed.sh)
 curl -sL yabs.sh | bas
 ```
 
+## 开启BBR
 
+```shell
+wget --no-check-certificate -O /opt/bbr.sh https://github.com/teddysun/across/raw/master/bbr.sh
+chmod 755 /opt/bbr.sh
+/opt/bbr.sh
+```
 
 ## Linux镜像源切换
 

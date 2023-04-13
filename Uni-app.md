@@ -19,9 +19,9 @@
 
   ![image-20221125163436722](C:\Users\Admin\Documents\Typora\Uni-app.assets\image-20221125163436722.png)
 
-- **注意：**如果是在组件中，`onLoad()、onUnload()`等小程序的生命周期不起作用，但是可以使用`creat()、beforeDestroy()`，所以注意不能用`onLoad()`接收参数实现页面间的传值，但是可以使用**页面通讯（全局事件总线），**`vuex`等方法进行传值
+- **注意：**如果是在**组件**中，`onLoad()、onUnload()`等小程序的生命周期不起作用，但是可以使用`creat()、beforeDestroy()`，所以注意不能用`onLoad()`接收参数实现页面间的传值，但是可以使用**页面通讯（全局事件总线），**`vuex`等方法进行传值
 
-- 若要**绑定样式**，可使用计算属性，直接绑定不生效
+- 若要**绑定样式**，可使用计算属性，直接绑定不生效（可能原因：渲染DOM的时候未拿到值，渲染不出来）
 
   - <img src="C:\Users\Admin\Documents\Typora\Uni-app.assets\image-20221129132953049.png" alt="image-20221129132953049" style="zoom:150%;" />
 
@@ -32,6 +32,8 @@
   - 解决方法二：使用数组写法（colorUI案例）
 
     ![image-20221129135756042](C:\Users\Admin\Documents\Typora\Uni-app.assets\image-20221129135756042.png)
+    
+  - **注意：**静态的样式统一写到 class 中。style 接收动态的样式，在运行时会进行解析，请尽量避免将静态的样式写进 style 中，以免影响渲染速度。
 
 - **自定义组件**中不能使用的标签选择器
 
@@ -121,6 +123,25 @@
 - 微信开发者工具无法直接使用本地图片，uni-app会转换为`Base64`格式
 - 可以使用行内样式，uni-app不会进行转换
 - 使用网络图片
+- 推荐使用计算属性，直接在行内样式引入会报**`Failed to load local image resource`**错误
+
+  ```vue
+  <template>
+  	<view class="topbox " :style="{backgroundImage: bgImage}"></view>
+  </template>
+  
+  <script>
+      export default {
+          computed: {
+              bgImage() {
+                  return 'url('+require('@/static/icon/register/bg03.png')+')'
+              }
+          },
+      }
+  </script>
+  ```
+
+  
 
 
 
@@ -140,3 +161,12 @@ div {
 [如何根据背景颜色动态修改文字颜色（掘金）](https://juejin.cn/post/6844903960487149582)
 
 [使用CSS完成效果](https://www.cnblogs.com/coco1s/p/16012545.html)
+
+
+
+
+
+
+
+
+
