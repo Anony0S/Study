@@ -210,11 +210,33 @@ if (to.matched.length === 0) {  //如果未匹配到路由
 
   ![image-20221208105120372](C:\Users\Admin\Documents\Typora\vue.assets\image-20221208105120372.png) 
 
-
-
 ### 注意事项
 
 - 如果自定义上传函数，注意使用上传前回调函数，异步的时候不起作用，即如果使用`image.onload()`进行图片操作，则阻挡不了上传事件
+
+
+## 文件下载
+
+```js
+axios
+    .get(
+      "https://qtnc.worldmaipu.com/admin/static/img/%E9%A6%96%E9%A1%B5.9d1f7334.jpg",
+      {
+        responseType: "blob",
+        headers: {
+          content: "test",
+        },
+      }
+    )
+    .then((res) => {
+      console.log("返回信息：", res);
+      const link = document.createElement("a");
+      link.download = "test.jpg"
+      link.href = window.URL.createObjectURL(res.data);
+      link.click();
+    });
+```
+
 
 
 
@@ -502,7 +524,7 @@ module.exports = {
 
 ## 获取设备陀螺仪
 
-> 注意需要在`HTTPS`下才会生效，安卓设备只支持前三种数值，**苹果设备有问题？？？？**
+> 注意需要在`HTTPS`下才会生效，安卓设备只支持前三种数值
 
 ```js
 window.addEventListener("deviceorientation", function (e) {
@@ -525,4 +547,52 @@ if (window.DeviceOrientationEvent) {
 }
 ```
 
-- 
+- 注意设备是否支持`absolute`
+
+- 可使用一下方案，强制使用`absolute`（未测试不同设备效果）
+
+- ```js
+  // 获取陀螺仪数据
+  function getGyro() {
+    if ("ondeviceorientationabsolute" in window) {
+      console.log("绝对方位");
+      window.addEventListener("deviceorientationabsolute", function (event) {
+        throttle(rotateMarker(-event.alpha), 100); // 设置旋转
+      });
+    } else if ("ondeviceorientation" in window) {
+      console.log("非绝对方位");
+      window.addEventListener(
+        "deviceorientation",
+        function (event) {
+          throttle(rotateMarker(-event.alpha), 100); // 设置旋转
+        },
+        false
+      );
+    } else {
+      console.log("不支持陀螺仪！");
+    }
+  }
+  
+  // 节流函数
+  function throttle(fn, wait) {
+    let timer = null;
+    return function () {
+      if (!timer) {
+        timer = setTimeout(function () {
+          fn.apply(this, arguments);
+          timer = null;
+        }, wait);
+      }
+    };
+  }
+  ```
+
+- 参考链接：[MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/deviceorientation_event)
+
+  
+
+## 字符串比较
+
+- [localCompare()  MDN示例](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare#%E4%BD%BF%E7%94%A8_localecompare)
+- [构造函数 Intl.Collator](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator)
+

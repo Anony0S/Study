@@ -166,6 +166,39 @@ div {
 
 
 
+##  微信开发者工具打不开
+1. uni-app，manifest.json, 微信小程序配置，请填写正确的微信appid
+2. uni-app，编译后的微信小程序代码，在unpackage目录下，复制路径，在微信开发者工具打开。
+来自 <https://ask.dcloud.net.cn/question/138939> 
+
+## 报错：  Vue is not defined
+在APP.vue 引入 import Vue from 'vue'
+
+## 判断开发还是生产环境
+```js
+if (process.env.NODE_ENV === 'development') {
+  console.log('开发环境')
+} else {
+  console.log('生产环境')
+}
+```
+
+
+## uView 导航栏透明
+去掉 顶部占位 -> placeholder
+rgba(0, 0, 0, 0)
+
+## uniApp页面滚动监听
+> https://codeantenna.com/a/wPRLnTmfeP
+
+
+
+## `web-view`覆盖原生组件
+
+- 使用`cover-view`实现，`position`设置为`fxed`，设置层级
+- 注意不能使用背景图片，可以使用`cover-image`
+- 其他注意事项参考：[MSDN](https://blog.csdn.net/WEIGUO19951107/article/details/94305964)
+
 
 
 

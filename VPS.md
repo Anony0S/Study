@@ -891,3 +891,8 @@ http {
 }
 
 ```
+
+1. `ps -ef | grep nginx`, 查找所有nginx进程
+2. `sudo kill -9 xxx xxx xxx`或者`sudo pkill nginx`
+3. `sudo systemctl restart nginx`
+4. `sudo nginx -t`
