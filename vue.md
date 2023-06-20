@@ -97,6 +97,8 @@ if (to.matched.length === 0) {  //如果未匹配到路由
 
 - **实现对上传图片的宽高进行限制**
 
+  - **`Image()`一个很好用的方法：`await img.decode(); // 等待图片加载完成`**
+
   - 通过`Image()`构造函数创建`img`实例（相当于创建了一个`img` `DOM`元素）
 
   - 设置`img`的`src`为上传的图片
@@ -373,6 +375,7 @@ module.exports = {
     //   }
     // }
     disableHostCheck: true, //关闭hostname检查
+    // allowedHosts：‘all’
    },
   configureWebpack:{  // 覆盖webpack默认配置的都在这里
     resolve:{   // 配置解析别名
@@ -595,4 +598,80 @@ if (window.DeviceOrientationEvent) {
 
 - [localCompare()  MDN示例](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare#%E4%BD%BF%E7%94%A8_localecompare)
 - [构造函数 Intl.Collator](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator)
+
+
+
+## 通过请求模拟a链接下载
+
+```js
+import axios from 'axios'
+
+axios
+    .get(
+      "https://qtnc.worldmaipu.com/admin/static/img/%E9%A6%96%E9%A1%B5.9d1f7334.jpg",
+      {
+        responseType: "blob", // 设置请求类型为 blob
+        headers: {
+          content: "test", // 可以加载 headers，例如用作校验 token
+        },
+      }
+    )
+    .then((res) => {
+      console.log("返回信息：", res);
+      const link = document.createElement("a");
+      link.download = "test.jpg"; // 此属性用于下载，属性值为下载名字，不填则由浏览器决定
+      link.href = window.URL.createObjectURL(res.data);
+      link.click();
+    });
+```
+
+
+
+## 主题切换方案
+
+- [前端主题切换](https://juejin.cn/post/7134594122391748615)
+
+- `vue3`中可以使用`v-bind`直接给style样式绑定变量：[官方文档](https://cn.vuejs.org/api/sfc-css-features.html#v-bind-in-css)
+
+  此方法可以响应更新css
+
+  
+
+## 配置跨域访问
+
+```js
+// vue.config.js
+module.exports = {
+    edvServer: {
+        headers: {
+			'Access-Control-Allow-Origin': '*',
+			'Access-Control-Allow-Headers': '*',
+			'Access-Control-Allow-Methods': '*'
+		},
+    }
+}
+
+
+// vite.config.js
+export default {
+    server: {
+        cors: true,
+        host: '0,0,0,0',
+    }
+}
+```
+
+- 参考文档：[掘金](https://juejin.cn/post/7205546336082001980)
+
+
+
+## element-plus nav 效果
+
+```css
+background-image: radial-gradient(transparent 1px, #ffffff 1px);
+background-size: 4px 4px;
+backdrop-filter: saturate(50%) blur(4px);
+```
+
+
 

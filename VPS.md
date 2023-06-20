@@ -896,3 +896,37 @@ http {
 2. `sudo kill -9 xxx xxx xxx`或者`sudo pkill nginx`
 3. `sudo systemctl restart nginx`
 4. `sudo nginx -t`
+
+
+
+## 安装QBittorrent
+
+```shell
+apt install qbittorrent-nox -y
+vim /etc/systemd/system/qbittorrent-nox.service
+
+
+
+[Unit]
+Description=qBittorrent Command Line Client
+After=network.target
+
+[Service]
+Type=forking
+User=root
+Group=root
+UMask=007
+ExecStart=/usr/bin/qbittorrent-nox -d --webui-port=8080
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+systemctl daemon-reload
+systemctl enable qbittorrent-nox
+systemctl status qbittorrent-nox
+
+```
+
