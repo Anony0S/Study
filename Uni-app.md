@@ -4,7 +4,7 @@
 
 - 转换为小程序时：组件外面会用`view`包裹，所以类名不生效，可以用上层类名
 
-  ![image-20221123111442490](C:\Users\Admin\Documents\Typora\Uni-app.assets\image-20221123111442490.png)
+  ![image-20230628133228317](Uni-app.assets/image-20230628133228317.png)
 
 - 微信调试工具不要开启转 ES5 组件会报错
 
@@ -17,21 +17,21 @@
 
 - **重要：**uni-app中不管在`data`中是否有定义，都可以直接`this.test = 'abc'`进行赋值而不会报错
 
-  ![image-20221125163436722](C:\Users\Admin\Documents\Typora\Uni-app.assets\image-20221125163436722.png)
+  ![image-20230628133233208](Uni-app.assets/image-20230628133233208.png)
 
 - **注意：**如果是在**组件**中，`onLoad()、onUnload()`等小程序的生命周期不起作用，但是可以使用`creat()、beforeDestroy()`，所以注意不能用`onLoad()`接收参数实现页面间的传值，但是可以使用**页面通讯（全局事件总线），**`vuex`等方法进行传值
 
 - 若要**绑定样式**，可使用计算属性，直接绑定不生效（可能原因：渲染DOM的时候未拿到值，渲染不出来）
 
-  - <img src="C:\Users\Admin\Documents\Typora\Uni-app.assets\image-20221129132953049.png" alt="image-20221129132953049" style="zoom:150%;" />
+  - ![image-20230628133237720](Uni-app.assets/image-20230628133237720.png)
 
   - 解决方法一：使用计算属性
 
-    ![image-20221129133536696](C:\Users\Admin\Documents\Typora\Uni-app.assets\image-20221129133536696.png)
+    ![image-20230628133245719](Uni-app.assets/image-20230628133245719.png)
 
   - 解决方法二：使用数组写法（colorUI案例）
 
-    ![image-20221129135756042](C:\Users\Admin\Documents\Typora\Uni-app.assets\image-20221129135756042.png)
+    ![image-20230628133249419](Uni-app.assets/image-20230628133249419.png)
     
   - **注意：**静态的样式统一写到 class 中。style 接收动态的样式，在运行时会进行解析，请尽量避免将静态的样式写进 style 中，以免影响渲染速度。
 

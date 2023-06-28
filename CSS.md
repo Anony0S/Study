@@ -60,7 +60,7 @@
 
 效果：
 
-​	　![image-20221227141616190](C:\Users\Admin\Documents\Typora\CSS.assets\image-20221227141616190.png)
+​	　![image-20230628133207813](CSS.assets/image-20230628133207813.png)
 
 
 
@@ -101,7 +101,7 @@
 
 ## 多列布局图片不铺满
 
-![image-20230318112128248](C:\Users\Admin\Documents\Typora\CSS.assets\image-20230318112128248.png)
+![image-20230628133216876](CSS.assets/image-20230628133216876.png)
 
 给图片添加属性`vertical-align: middle;`
 
