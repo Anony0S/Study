@@ -120,3 +120,9 @@ type AnyOf<T extends any[]> = T[number] extends 0 | '' | false | [] | {[key: str
 ? false : true;
 ```
 
+
+
+## 其他
+
+- type 中使用`never` 做键，就能把字段值排除
+- 判断是否为某一种类型的键：`string extends K`
