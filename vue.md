@@ -675,3 +675,11 @@ backdrop-filter: saturate(50%) blur(4px);
 
 
 
+## 图片请求403
+
+- 添加到 index.html 里面
+
+```html
+<meta name="referrer" content="no-referrer" />
+```
+

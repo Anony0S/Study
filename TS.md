@@ -125,4 +125,25 @@ type AnyOf<T extends any[]> = T[number] extends 0 | '' | false | [] | {[key: str
 ## 其他
 
 - type 中使用`never` 做键，就能把字段值排除
+
 - 判断是否为某一种类型的键：`string extends K`
+
+- 数组转联合类型用`[number]`作为下标
+
+  ```typescript
+  ['1', '2'][number] // '1' | '2'
+  ```
+
+- 对象转联合类型用`[keyof T]`作为下标
+
+  ```typescript
+  type ObjectToUnion<T> = T[keyof T]
+  ```
+
+- 函数可以直接按照函数的方式`结构`，使用`...args`获取到所有入参的数组
+
+  ```typescript
+  type FlipArguments<T extends (...args: any[]) => any> = T extends (...args: infer P) => infer U ? (...args: Reverse<P>) => U : never
+  ```
+
+  
