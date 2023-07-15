@@ -446,7 +446,7 @@
   - value：接收到的值
   - metadata：与get请求时的pipe类似
   - 注意 metadata.metatype 即 dto 里定义的 class， 通过 plainToInstance 将 value 转换为此类的实例对象，再通过 validate 进行验证
-  ![image-20230714134847858](C:\Users\Admin\Documents\Typora\Nest.assets\image-20230714134847858.png)
+  ![image-20230714134847858](Nest.assets\image-20230714134847858.png)
 
 - 此外 pipe 中也可以进行依赖注入，方法同常规一样，但是需要去掉手动new`@Body(ValidationPipe）` 
 - 若要创建全局 pipe，可以使用 nest 提供的 token ： **APP_PIPE**，方法同 Interceptor
@@ -481,3 +481,84 @@
 
 ## Express 文件上传
 
+> 通过 multer 包实现文件上传
+
+1. 单文件上传
+
+   ```typescript
+   const upload = multer({ dest: 'uploads/' }) // 此处设置上传路径
+   
+   // 这里 single 参数为上传 formData 的 key，只有对应才能上传
+   app.post('/aaa', upload.single('aaa'), function (req, res, next) {
+     console.log('req.file', req.file);
+     console.log('req.body', req.body);
+   })
+   ```
+
+   - `req.file`为文件相关信息
+
+   - `req.body`为非文件的字段
+
+     
+
+2. 多文件上传 - 通过 upload.array，可以指定最大上传数量
+
+   ```typescript
+   app.post('/bbb', upload.array('bbb', 2), function (req, res, next) {
+   	console.log('req.files', req.files);
+   	console.log('req.body', req.body);
+   }, function (err, req, res, nest) { // 第二个回调为错误处理
+   	if (err instanceof multer.MulterError && err.code === 'LIMIT_UNEXPECTED_FILE') {
+   		res.status(400).end('Too many files uploaded')
+   	}
+   })
+   ```
+
+   - 可以通过添加第二个回调函数，对上传出现的错误进行捕获处理
+
+     
+
+3. 多个字段上传文件 - 可以对不同的字段做不同数量的限制
+
+   ```typescript
+   app.post('/ccc', upload.fields([
+   	{ name: 'aaa', maxCount: 3 },
+   	{ name: 'bbb', maxCount: 2 }
+   ]), function (req, res, next) {
+   	console.log('req.files:', req.files);
+   	console.log('req.body:', req.body);
+   })
+   ```
+
+4. 不设置上传字段
+
+   ```typescript
+   app.post('/ddd', upload.any(), function (req, res, next) {
+   	console.log('req.files:', req.files);
+   	console.log('req.body:', req.body);
+   })
+   ```
+
+5. 自定义**上传路径**和**保存文件名**
+
+   ```typescript
+   // 设置保存路径和文件名 - 其他用法同上
+   const storage = multer.diskStorage({
+   	destination: function (req, file, cb) {
+   		try {
+   			fs.mkdirSync(path.join(process.cwd(), 'my-uploads'))
+   		} catch (e) {
+   			cb(null, path.join(process.cwd(), 'my-uploads'))
+   		}
+   	},
+   	filename: function (req, file, cb) {
+   		const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9) + '-' + file.originalname;
+   		cb(null, file.fieldname + '-' + uniqueSuffix)
+   	}
+   })
+   const upload = multer({ storage }) // 上传文件的目录
+   ```
+
+   
+
+   
