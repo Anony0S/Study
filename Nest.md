@@ -287,5 +287,197 @@
 
 
 
-## RxJS 和 Interceptor 
+## 18、RxJS 和 Interceptor 
+
+### RxJS
+
+- tap: 不修改响应数据，执行一些额外逻辑，比如记录日志、更新缓存等
+- map：对响应数据做修改，一般都是改成 {code, data, message} 的格式
+- catchError：在 exception filter 之前处理抛出的异常，可以记录或者抛出别的异常
+- timeout：处理响应超时的情况，抛出一个 TimeoutError，配合 catchErrror 可以返回超时的响应
+
+### Interceptor
+
+- 全局注入：main.ts 中 `app.useGlobalInterceptors(new xxxInterceptor())`
+
+  这种手动 new 的没法注入依赖
+
+- 使用 Nest 提供的 token 实现全局注入
+
+  ![img](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5e126e39cc9e435aac798e07947c4cfb~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp?)
+
+
+
+## 19、内置 Pipe 和 自定义 Pipe
+
+### 内置Pipe
+
+- 直接使用如： `@Query('aa', ParseIntPipe)`
+
+- 通过 new 关键字创建（此方法可以传参进行一些自定义）
+
+  ```typescript
+  @Get()
+    getHello(
+      @Query(
+        'aa',
+        new ParseIntPipe({
+          // errorHttpStatusCode: HttpStatus.NOT_FOUND, // 指定错误状态码
+          exceptionFactory: (msg) => {
+            // 自定义错误信息 抛出异常
+            console.log(msg);
+            throw new HttpException('xxx' + msg, HttpStatus.NOT_IMPLEMENTED);
+          },
+        }),
+      )
+      aa: string,
+    ): string {
+      console.log(aa);
+      return aa + 1;
+      // return this.appService.getHello();
+    }
+  ```
+
+- **ParseArrayPipe**
+
+  ```typescript
+    @Get('cc')
+    getCc(
+      @Query(
+        'cc',
+        new ParseArrayPipe({
+          items: Number, // 指定每一项数据类型
+          separator: '.', // 指定分隔符
+          optional: true, // 参数可选
+        }),
+      )
+      cc: number[],
+    ) {
+      console.log(cc);
+      return cc;
+    }
+  ```
+
+- **ParseEnumPipe**
+  
+  ```typescript
+  // 先定义 enum 
+  enum Color {
+    a = 'red',
+    b = 'blue',
+    c = 'green',
+  }
+  
+  // 使用
+  // 此方法可以根据定义的 enum 限制传递的参数
+  @Get('color/:id')
+    getColor(@Param('id', new ParseEnumPipe(Color)) id: Color) {
+      return id;
+    }
+  ```
+
+### 自定义 Pipe
+
+- 使用命令生成文件 `nest g pipe aaa --flat --no-spec`
+
+- 创建的 pipe 的返回值会传递到 handler 里面 
+
+  ```typescript
+  import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
+  
+  @Injectable()
+  export class AaaPipe implements PipeTransform {
+    transform(value: any, metadata: ArgumentMetadata) {
+      console.log(value, metadata);
+      return 'aaa';
+    }
+  }
+  ```
+
+  - **value**：handler里面接收到的值
+
+  - **metadata**：元数据对象，包含有关传递给管道的值的其他信息，例如它的类型和所在的位置![image-20230714103916060](Nest.assets/image-20230714103916060.png)
+    - metatype：参数的ts类型
+    
+    - type：装饰器
+    
+    - data：传给装饰器的参数
+      ![image-20230714104444593](Nest.assets/image-20230714104444593.png)
+
+
+
+## 20、ValidationPipe
+
+1. 安装依赖包 `npm install -D class-validator class-transformer`
+2. @Body(new ValidationPipe()) 
+3. 在 dto 这里，用 class-validator 包的 @IsInt(或其他) 装饰器标记一下
+
+- 自定义 ValiditionPipe
+
+  ```typescript
+  import {
+    ArgumentMetadata,
+    Injectable,
+    PipeTransform,
+    BadRequestException,
+  } from '@nestjs/common';
+  import { plainToInstance } from 'class-transformer';
+  import { validate } from 'class-validator';
+  
+  @Injectable()
+  export class MyValidationPipe implements PipeTransform {
+  
+    async transform(value: any, metadata: ArgumentMetadata) {
+      console.log('value:', value);
+      console.log('metadata:', metadata);
+  
+      if (!metadata.metatype) return value;
+      console.log(this.options);
+      const object = plainToInstance(metadata.metatype, value);
+      const errors = await validate(object);
+      if (errors.length > 0) {
+        throw new BadRequestException('参数验证失败!');
+      }
+      return value;
+    }
+  }
+  
+  ```
+  - value：接收到的值
+  - metadata：与get请求时的pipe类似
+  - 注意 metadata.metatype 即 dto 里定义的 class， 通过 plainToInstance 将 value 转换为此类的实例对象，再通过 validate 进行验证
+  ![image-20230714134847858](C:\Users\Admin\Documents\Typora\Nest.assets\image-20230714134847858.png)
+
+- 此外 pipe 中也可以进行依赖注入，方法同常规一样，但是需要去掉手动new`@Body(ValidationPipe）` 
+- 若要创建全局 pipe，可以使用 nest 提供的 token ： **APP_PIPE**，方法同 Interceptor
+- 如果不需要注入依赖（即在 pipe 里使用 @Inject），可以在 main.ts 中使用 App.useGlobalPipes(new xxxValidetionPipe())进行全局注入
+- 此外，内置 ValidetionPipe 还包含以下验证方式  
+  - @**Length**(10, 20)
+  - @**Contains**('hello')
+  - @**IsInt**()    @**Min**(0)    @**Max**(10)
+  - @**IsEmail**()
+  - @**IsFQDN**() // 是否是域名
+
+- 自定义 message 信息：传入 message 函数
+
+  ```typescript
+  @Length(10, 20, {
+      message({targetName, property, value, constraints}) {
+          return `${targetName} 类的 ${property} 属性的值 ${value} 不满足约束: ${constraints}`
+      }
+  })
+  title: string;
+  ```
+
+- [更多装饰器](https://www.npmjs.com/package/class-validator)
+
+
+
+## 21、串一串Nest核心概念
+
+<img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/24060e0f32204907887ede38c1aa018c~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp?" alt="img" />
+
+
+
+## Express 文件上传
 
