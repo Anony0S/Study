@@ -446,7 +446,7 @@
   - value：接收到的值
   - metadata：与get请求时的pipe类似
   - 注意 metadata.metatype 即 dto 里定义的 class， 通过 plainToInstance 将 value 转换为此类的实例对象，再通过 validate 进行验证
-  ![image-20230714134847858](Nest.assets\image-20230714134847858.png)
+  ![](Nest.assets\image-20230714134847858.png)
 
 - 此外 pipe 中也可以进行依赖注入，方法同常规一样，但是需要去掉手动new`@Body(ValidationPipe）` 
 - 若要创建全局 pipe，可以使用 nest 提供的 token ： **APP_PIPE**，方法同 Interceptor
@@ -479,7 +479,7 @@
 
 
 
-## Express 文件上传
+## 22、Express 文件上传
 
 > 通过 multer 包实现文件上传
 
@@ -559,6 +559,315 @@
    const upload = multer({ storage }) // 上传文件的目录
    ```
 
-   
 
+
+## 23、Nest 文件上传 
+
+1. 安装 multer 类型包 `npm install -D @types/multer`
+
+2. 添加 handler 
+
+   - ```typescript
+     @Post('aaa')
+     @UseInterceptors(FileInterceptor('aaa', {
+         dest: 'uploads'
+     }))
+     uploadFile(@UploadedFile() file: Express.Multer.File, @Body() body) {
+         console.log('body', body);
+         console.log('file', file);
+     }
+     ```
+
+     - 使用 FileInterceptor 来提取 aaa 字段，然后通过 UploadedFile 装饰器把它作为参数传入。
+
+   - 多文件上传
+
+     ```typescript
+     @Post('bbb')
+     @UseInterceptors(FilesInterceptor('bbb', 3, {
+         dest: 'uploads'
+     }))
+     uploadFiles(@UploadedFiles() files: Array<Express.Multer.File>, @Body() body) {
+         console.log('body', body);
+         console.log('files', files);
+     }
+     ```
+
+   - 多个文件字段
+
+     ```typescript
+     @Post('ccc')
+     @UseInterceptors(FileFieldsInterceptor([
+         { name: 'aaa', maxCount: 2 },
+         { name: 'bbb', maxCount: 3 },
+     ], {
+         dest: 'uploads'
+     }))
+     uploadFileFields(@UploadedFiles() files: { aaa?: Express.Multer.File[], bbb?: Express.Multer.File[] }, @Body() body) {
+         console.log('body', body);
+         console.log('files', files);
+     }
+     ```
+
+   - 任何字段
+
+     ```typescript
+     @Post('ddd')
+     @UseInterceptors(AnyFilesInterceptor({
+         dest: 'uploads'
+     }))
+     uploadAnyFiles(@UploadedFiles() files: Array<Express.Multer.File>, @Body() body) {
+         console.log('body', body);
+         console.log('files', files);
+     }
+     ```
+
+3. 指定 storage（存储路径和文件名）
+
+     - ```typescript
+       // 设置存储路径和文件名
+       import * as multer from "multer";
+       import * as fs from 'fs';
+       import * as path from "path";
+       
+       const storage = multer.diskStorage({
+           destination: function (req, file, cb) {
+               try {
+                   fs.mkdirSync(path.join(process.cwd(), 'my-uploads'));
+               }catch(e) {}
+       
+               cb(null, path.join(process.cwd(), 'my-uploads'))
+           },
+           filename: function (req, file, cb) {
+               const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9) + '-' + file.originalname
+               cb(null, file.fieldname + '-' + uniqueSuffix)
+           }
+       });
+       
+       export { storage };
+       ```
+
+     - 使用
+
+       ```typescript
+       @Post('ddd')
+       @UseInterceptors(AnyFilesInterceptor({
+        	storage: storage   
+       })
+       uploadFiles(@UploadedFiles() files: Array<Express.Multer.File>, @Body() body) {
+           console.log('body', body);
+           console.log('files', files);
+       }
+       ```
+
+4. 自定义文件校验
+
+     - 使用 pipe 
+
+       ```typescript
+       import { PipeTransform, Injectable, ArgumentMetadata, HttpException, HttpStatus } from '@nestjs/common';
+       
+       @Injectable()
+       export class FileSizeValidationPipe implements PipeTransform {
+         transform(value: Express.Multer.File, metadata: ArgumentMetadata) {
+           if(value.size > 10 * 1024) {
+             throw new HttpException('文件大于 10k', HttpStatus.BAD_REQUEST);
+           }
+           return value;
+         }
+       }
+       ```
+
+     - 直接添加到 UploadedFile 里面
+
+       ```typescript
+       uploadFiles(@UploadedFiles(FileSizeValidationPipe) files: Array<Express.Multer.File>, @Body() body) {
+           console.log('body', body);
+           console.log('files', files);
+       }
+       ```
+
+5. 内置文件校验
+
+   ```typescript
+   @Post('aaa')
+     @UseInterceptors(FileInterceptor('aaa', { dest: 'uploads' }))
+     uploadFile(
+       @UploadedFile(
+         new ParseFilePipe({
+           exceptionFactory(error) { // 自定义文件校验失败信息
+             console.log('error:', error);
+             throw new HttpException('文件校验失败!', 404);
+           },
+           validators: [
+             new MaxFileSizeValidator({ // 文件大小校验 - 可以传入 message 失败信息
+               maxSize: 10 * 1024 * 1024,
+               message: '文件大于 10K 了',
+             }),
+             new FileTypeValidator({ // 文件类型校验 - 没有 message 参数
+               fileType: 'image/png',
+             }),
+           ],
+         }),
+       )
+       files: { aaa?: Express.Multer.File },
+       @Body() body,
+     ) {
+       console.log('body:', body);
+       console.log('file:', files);
+     }
+   ```
+
+6. 自定义 FileValidator
+
+   ```typescript
+   import { FileValidator } from "@nestjs/common";
    
+   export class MyFileValidator extends FileValidator{
+       constructor(options) {
+           super(options);
+       }
+       isValid(file: Express.Multer.File): boolean | Promise<boolean> {
+           if(file.size > 10000) {
+               return false;
+           }
+           return true;
+       }
+       buildErrorMessage(file: Express.Multer.File): string {
+           return `文件 ${file.originalname} 大小超出 10k`;
+       }
+   }
+   ```
+
+
+
+## 24、Nest 打印日志
+
+> 暂时只做了解
+
+
+
+## 25、学习Docker
+
+- `docker pull`：拉取镜像
+- `docker run --name nginx-test2 -p 80:80 -v /tmp/aaa:/usr/share/nginx/html -e KEY1=VALUE1 -d nginx:latest `
+  - -p 是端口映射
+  - -v 是指定数据卷挂载目录
+  - -e 是指定环境变量
+  - -d 是后台运行
+
+- `docker exec`：相当于在容器内执行命令
+  - -i 是 terminal 交互的方式运行
+  - -t 是 tty 终端类型
+  - 例如：`docker exec -i -t 68630e312c6ebf8b4ded7e9a583d6c5a4e75a1c95948415397a136b329ae5fb5 /bin/bash`
+- `docker inspect`：查看容器详情
+- `docker volume`：管理卷数据
+- `docker start`：启动一个已经停止的容器
+- `docker rm`：删除一个容器
+- `docker stop`：停止一个容器
+
+
+
+## 26、DockerFile
+
+- ```typescript
+  FROM node:latest
+  
+  WORKDIR /app
+  
+  COPY . .
+  
+  RUN npm config set registry https://registry.npmmirror.com/
+  
+  RUN npm install -g http-server
+  
+  EXPOSE 8080
+  
+  VOLUME /app
+  
+  CMD ["http-server", "-p", "8080"]
+  ```
+
+  - FROM：基于一个基础镜像来修改
+  - WORKDIR：指定当前工作目录
+  - COPY：把容器外的内容复制到容器内
+  - EXPOSE：声明当前容器要访问的网络端口，比如这里起服务会用到 8080
+  - RUN：在容器内执行命令
+  - CMD：容器启动的时候执行的命令
+  - VOLUME：设置挂载点
+
+- `docker build -t aaa:ddd -f 2.Dockerfile .`
+
+  - -t：指定 name:tag
+  - -f：指定 dockerfile 文件名，默认为 dockerfile
+
+
+
+## 27、Nest 编写 Dockerfile
+
+- .dockerignore文件：忽略哪些文件 - 即构建的时候不会参与
+
+  ```dockerfile
+  *.md
+  !README.md
+  node_modules/
+  [a-c].txt
+  .git/
+  .DS_Store
+  .vscode/
+  .dockerignore
+  .eslintignore
+  .eslintrc
+  .prettierrc
+  .prettierignore
+  ```
+
+  - ***.md**：忽略所有md结尾的文件
+  - **!README.md**：不包含README.md文件
+  - **node_modules/**：忽略 node_modules 下 的所有文件
+  - **[a-c].txt**：忽略 a.txt、b.txt、c.txt 这三个文件
+  - 
+
+  
+
+- 使用多阶段构建和 alpine 减小构建镜像体积
+
+  ```dockerfile
+  # 第一次构建 - nest 打包
+  FROM node:lts-alpine as build-stage
+  
+  WORKDIR /app
+  
+  COPY package*.json ./
+  
+  # 替换 npm 镜像源，可以不用 
+  # RUN npm config set registry https://registry.npmmirror.com 
+  RUN npm install
+  
+  COPY . .
+  
+  RUN npm run build
+  
+  # 第二次构建 - 将第一次构建的 dist 复制出来
+  FROM node:lts-alpine as production-stage
+  
+  COPY --from=build-stage /app/dist /app
+  COPY --from=build-stage /app/package.json /app/package.json
+  
+  WORKDIR /app
+  
+  RUN npm install --production
+  
+  EXPOSE 3000
+  
+  CMD ["node", "/app/main.js"]
+  ```
+
+
+
+## 28、提升 Dockerfile
+
+- 使用 alpine 基础镜像构建 - 减小构建镜像体积
+- 使用多阶段构建 - 去掉不必要的文件
+- package.json 单独安装，利用 Docker 缓存加快构建速度
+- 
