@@ -683,3 +683,20 @@ backdrop-filter: saturate(50%) blur(4px);
 <meta name="referrer" content="no-referrer" />
 ```
 
+
+
+## Vite 配置路径别名
+
+```js
+// vite.config.js
+import path from "path"
+import { defineConfig } from "vite";
+export default defineConfig({
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    }
+  }
+});
+```
+
