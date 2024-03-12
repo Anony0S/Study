@@ -1,0 +1,26 @@
+<!-- pages/node/monitor.wxml -->
+<view class="date-section">
+  <view class="picker-box">
+    <view class="picker-box-start">
+      <picker mode="date" value="{{startDate}}" bindchange="bindStartDateChange">
+        <view class="picker">开始时间: {{startDate}}</view>
+      </picker>
+    </view>
+    <view style="width: 2px; height: 80%; background-color: #f5f5f5;"></view>
+    <view class="picker-box-end">
+      <picker mode="date" value="{{endDate}}" bindchange="bindEndDateChange">
+        <view class="picker">结束时间: {{endDate}}</view>
+      </picker>
+    </view>
+  </view>
+</view>
+
+<view class="tabs-box">
+  <t-tabs space-evenly="{{false}}" value="{{currentTab}}" bind:change="onTabsChange">
+    <t-tab-panel wx:for="{{tabs}}" label="{{item}}" value="{{index}}" wx:key="index">
+    </t-tab-panel>
+  </t-tabs>
+  <view class="tab-container">
+    <ec-canvas id="mychart" canvas-id="mychart" ec="{{ec}}"></ec-canvas>
+  </view>
+</view>

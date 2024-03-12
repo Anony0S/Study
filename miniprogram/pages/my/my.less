@@ -1,0 +1,150 @@
+/* pages/my/my.wxss */
+page {
+  background-color: #fff;
+  background-image: var(--theme-bg-linear2);
+  .t-icon-base {
+    color: var(--theme-color);
+  }
+  --td-input-vertical-padding: 10rpx;
+}
+
+// 上面部分
+.main-card {
+  position: relative;
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  padding: 20rpx 0;
+  margin: 30rpx 30rpx;
+  border-radius: 20rpx;
+  box-shadow: 0px 0px 12px rgba(0, 0, 0, .12);
+  color: #333;
+  overflow: hidden;
+  background-color: #fff;
+
+  .my-info {
+    width: 100%;
+    display: flex;
+    padding: 10rpx 20rpx;
+    align-items: center;
+    padding-bottom: 30rpx;
+    overflow: hidden;
+
+    .my-icon {
+      width: 120rpx;
+      height: 120rpx;
+      background-color: #fff;
+      border-radius: 50%;
+      box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, .12);
+    }
+
+    .my-phone {
+      font-size: 24px;
+      margin-left: 20rpx;
+      color: #333;
+      font-family: 'Times New Roman', Times, serif;
+      font-weight: 700;
+    }
+  }
+
+  .main-card-item {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    // border: 1px solid red;
+    box-sizing: border-box;
+    .item-top {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      &__image {
+        width: 60rpx;
+        height: 60rpx;
+        margin-right: 10rpx;
+      }
+      &__title {
+        line-height: 1;
+        font-size: 18px;
+      }
+    }
+  
+    .item-bottom {
+      display: flex;
+      font-size: 22px;
+      font-weight: 700;
+      margin-top: 20rpx;
+      align-items: flex-end;
+      text:nth-child(1) {
+        font-size: 14px;
+      }
+      view:nth-child(2) {
+        color: var(--theme-money-color);
+        line-height: 1;
+      }
+    }
+  
+    &:nth-child(1),
+    &:nth-child(2) {
+      margin-bottom: 30rpx;
+    }
+  }
+}
+
+// <!-- 下面部分 -- 未显示 -->
+.other-box {
+  padding: 30rpx;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+  .other-item {
+    width: 25%;
+    text-align: center;
+    margin: 30rpx 0;
+    // border: 1px solid black;
+
+    &-icon {
+      height: 80rpx;
+
+      image {
+        height: 70%;
+        width: 70%;
+      }
+    }
+
+    &-text {
+      color: #333;
+    }
+  }
+}
+
+// 其他
+.t-dialog__wrapper .t-dialog__header {
+  margin-bottom: 20rpx;
+  font-size: 18px !important;
+}
+
+.t-input {
+  border: 1px solid #cccccc;
+  border-radius: 10rpx;
+  margin-top: 15rpx;
+}
+
+.t-dialog t-input:not(:last-child) {
+  margin-bottom: 10rpx;
+}
+
+// ===== 背景修改 =====
+.t-cell {
+  background-color: transparent !important;
+}
+
+.t-icon-base {
+  font-size: 20px;
+}
+
+.t-input__wrap--prefix {
+  align-items: center;
+}

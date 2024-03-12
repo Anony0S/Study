@@ -1,0 +1,102 @@
+<!-- pages/my/userinfo.wxml -->
+<view class="userinfo-form">
+  <t-input placeholder="请选择提现类型" suffixIcon="chevron-right" bind:tap="showPicker" value="{{payeeTypeLabel}}" disabled readonly>
+    <text slot="label">
+      <text style="color: #e34d59">*</text>
+      <text>提现类型</text>
+    </text>
+  </t-input>
+  <t-input placeholder="请输入姓名" data-key="name" bind:change="handleInput" model:value="{{withdrawInfo.name}}">
+    <text slot="label">
+      <text style="color: #e34d59">*</text>
+      <text>姓名</text>
+    </text>
+  </t-input>
+  <t-input placeholder="请输入手机号" data-key="phone" bind:change="handleInput" type="number" model:value="{{withdrawInfo.phone}}">
+    <text slot="label">
+      <text style="color: #e34d59">*</text>
+      <text>手机号</text>
+    </text>
+  </t-input>
+  <t-input placeholder="请输入身份证" data-key="card_no" bind:change="handleInput" type="idcard" model:value="{{withdrawInfo.card_no}}">
+    <text slot="label">
+      <text style="color: #e34d59">*</text>
+      <text>身份证</text>
+    </text>
+  </t-input>
+  <view class="form-item">
+    <view class="form-item-text">
+      <text style="color: #e34d59">*</text>
+      <text>身份证正面</text>
+    </view>
+    <view class="form-item-upload">
+      <t-upload mediaType="{{['image']}}" files="{{card_front_pic}}" bind:add="handleAdd" data-key="card_front_pic" bind:remove="handleRemove" max="{{1}}"></t-upload>
+    </view>
+  </view>
+  <view class="form-item">
+    <view class="form-item-text">
+      <text style="color: #e34d59">*</text>
+      <text>身份证反面</text>
+    </view>
+    <view class="form-item-upload">
+      <t-upload mediaType="{{['image']}}" files="{{card_back_pic}}" data-key="card_back_pic" bind:add="handleAdd" bind:remove="handleRemove" max="{{1}}"></t-upload>
+    </view>
+  </view>
+  <t-input placeholder="请输入银行名称" data-key="bank" bind:change="handleInput" model:value="{{withdrawInfo.bank}}" wx:if="{{payeeType!==3}}">
+    <text slot="label">
+      <text style="color: #e34d59">*</text>
+      <text>银行名</text>
+    </text>
+  </t-input>
+  <t-input placeholder="请输入开户行地址" data-key="bank_addr" bind:change="handleInput" model:value="{{withdrawInfo.bank_addr}}" wx:if="{{payeeType!==3}}">
+    <text slot="label">
+      <text style="color: #e34d59">*</text>
+      <text>开户行</text>
+    </text>
+  </t-input>
+  <t-input placeholder="请输入银行卡号" data-key="bank_no" bind:change="handleInput" model:value="{{withdrawInfo.bank_no}}" wx:if="{{payeeType!==3}}">
+    <text slot="label">
+      <text style="color: #e34d59">*</text>
+      <text>银行卡号</text>
+    </text>
+  </t-input>
+  <view class="form-item" wx:if="{{payeeType===2}}">
+    <view class="form-item-text">
+      <text style="color: #e34d59">*</text>
+      <text>营业执照</text>
+    </view>
+    <view class="form-item-upload">
+      <t-upload mediaType="{{['image']}}" files="{{license_pic}}" data-key="license_pic" bind:add="handleAdd" bind:remove="handleRemove" max="{{1}}"></t-upload>
+    </view>
+  </view>
+  <t-input placeholder="请输入营业执照地址" data-key="address" model:value="{{withdrawInfo.address}}" bind:change="handleInput" wx:if="{{payeeType===2}}">
+    <text slot="label">
+      <text style="color: #e34d59">*</text>
+      <text>地址</text>
+    </text>
+  </t-input>
+  <t-input placeholder="请输入税号" data-key="tax_no" bind:change="handleInput" model:value="{{withdrawInfo.tax_no}}" wx:if="{{payeeType===2}}">
+    <text slot="label">
+      <text style="color: #e34d59">*</text>
+      <text>税号</text>
+    </text>
+  </t-input>
+  <t-input placeholder="请输入支付宝账号" data-key="alipay_account" bind:change="handleInput" model:value="{{withdrawInfo.alipay_account}}" wx:if="{{payeeType===3}}">
+    <text slot="label">
+      <text style="color: #e34d59">*</text>
+      <text>支付宝</text>
+    </text>
+  </t-input>
+  <view class="checkbox-view">
+    <label class="checkbox">
+      <checkbox style="transform: scale(0.7);" model:checked="{{isChecked}}" />阅读并同意<text class="text-url" data-index="0" bindtap="toProtocol">《用户协议》</text>与<text class="text-url" data-index="1" bindtap="toProtocol">《隐私政策》</text>
+    </label>
+  </view>
+  <view class="btn-update">
+    <t-button wx:if="{{certificationVisible}}" block theme="danger" shape="round" bindtap="toCertification">点击完成实名电签</t-button>
+    <t-button block theme="primary" shape="round" bindtap="toUpdate">修改</t-button>
+  </view>
+</view>
+<t-picker visible="{{payeeTypesVisible}}" value="{{[payeeType]}}" title="请选择提现类型" cancelBtn="取消" confirmBtn="确认" bindchange="onPickerChange">
+  <t-picker-item options="{{payeeTypes}}"></t-picker-item>
+</t-picker>

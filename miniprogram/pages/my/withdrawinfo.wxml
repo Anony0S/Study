@@ -1,0 +1,49 @@
+<!--pages/my/withdrawinfo.wxml-->
+<wxs module="utils" src="../../utils/index.wxs"></wxs>
+<t-sticky offset-top="{{ 5 }}">
+  <view class="date-section">
+    <view class="picker-box">
+      <view class="picker-box-start">
+        <picker mode="date" value="{{startDate}}" bindchange="bindStartDateChange">
+          <view class="picker">开始时间: {{startDate}}</view>
+        </picker>
+      </view>
+      <view style="width: 2px; height: 80%; background-color: #f5f5f5;"></view>
+      <view class="picker-box-end">
+        <picker mode="date" value="{{endDate}}" bindchange="bindEndDateChange">
+          <view class="picker">结束时间: {{endDate}}</view>
+        </picker>
+      </view>
+    </view>
+  </view>
+</t-sticky>
+
+<view class="list">
+  <view class="list-item" wx:for="{{list}}" wx:key="index">
+    <view class="list-item-tr">
+      <view class="list-item-title">时间:</view>
+      <view class="list-item-value">
+        <text>{{item.ctime}}</text>
+
+      </view>
+    </view>
+    <view class="list-item-tr">
+      <view class="list-item-title">状态:</view>
+      <view class="list-item-value">
+        <text class="list-item-status list-item-status-{{item.status}}">{{WithDrawTypeLabels[item.status - 1]}}</text>
+      </view>
+    </view>
+    <view class="list-item-tr">
+      <view class="list-item-title">提现金额:</view>
+      <view class="list-item-value">
+        <text class="list-item-table-symbol">￥</text>
+        <text>{{utils.getMoneyNoSymbol(item.amount)}}</text>
+      </view>
+    </view>
+    <view class="list-item-tr" wx:if="{{item.remark}}">
+      <view class="list-item-title">备注:</view>
+      <view class="list-item-value" style="color: #f56c6c;">{{item.remark}}</view>
+    </view>
+  </view>
+  <view class="no-data">已加载所有数据</view>
+</view>

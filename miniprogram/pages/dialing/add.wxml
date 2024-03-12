@@ -1,0 +1,11 @@
+<!-- pages/dialing/add.wxml -->
+<view class="add-title">
+  {{ isIpType ? "批量填写该网卡关联的vlan_id、IP/掩码、网关" : "批量填写该网卡关联的vlan_id、拨号账号、拨号密码"}}，每个账号请单列一行
+</view>
+<view class="textarea-box">
+  <textarea maxcharacter="-1" maxlength="-1" bordered placeholder="{{textareaHolder}}" model:value="{{textareaValue}}" />
+</view>
+<view class="btn-box">
+  <t-button theme="danger" block bindtap="clear">清空</t-button>
+  <t-button theme="primary" block bindtap="identifyTextarea">识别</t-button>
+</view>

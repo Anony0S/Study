@@ -1,0 +1,19 @@
+<!-- pages/node/comp/network.wxml -->
+<view class="network-info">
+  <view class="network-tr" wx:for="{{content}}" wx:key="key">
+    <view class="network-td">{{item.label}}</view>
+    <view data-key="{{item.key}}" class="network-td {{item.key === 'up_bandwidth' ||item.key === 'device_net_card_extend' || item.key === 'dialingInfo' ? 'network-link':''}}" bindtap="toDialing">
+      <view wx:if="{{item.key === 'up_bandwidth'}}">
+        <text class="btn-text" bindtap="openobdlog">{{item.value}}</text>
+      </view>
+      <view wx:else> {{item.value}} </view>
+    </view>
+  </view>
+  <view class="network-tr" wx:if="{{info.biz_type !== 4 && info.biz_type !== 5 && info.biz_type !== 8}}">
+    <view class="network-td">测试带宽</view>
+    <view data-key="{{item.key}}" class="network-td network-link">
+      <text bindtap="openDialog" style="color: var(--theme-color); margin-right: 20rpx;">测试</text>
+      <text bindtap="toDetail" style="color: var(--theme-color); margin-right: 20rpx;">详情</text>
+    </view>
+  </view>
+</view>

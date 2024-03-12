@@ -1,0 +1,82 @@
+<!-- pages/node/comp/quality.wxml -->
+<wxs module="filters" src="./quality.wxs"></wxs>
+<block>
+  <view class="quality-info">
+    <view class="quality-tr">
+      <view class="quality-td">设备诊断</view>
+      <view class="quality-td">{{info.result}}</view>
+    </view>
+    <view class="quality-tr">
+      <view class="quality-td">报告时间</view>
+      <view class="quality-td">{{info.date}}</view>
+    </view>
+    <view class="quality-tr">
+      <view class="quality-td">CPU利用率</view>
+      <view class="quality-td">{{info.cpuUsage.result}} | {{filters.toPerc(info.cpuUsage.value)}}%</view>
+    </view>
+    <view class="quality-tr">
+      <view class="quality-td">内存利用率</view>
+      <view class="quality-td">{{info.memUsage.result}} | {{filters.toPerc(info.memUsage.value)}}%</view>
+    </view>
+  </view>
+  <view class="table-title">磁盘信息</view>
+  <view class="table">
+    <view class="table-tr table-tr-th">
+      <view class="table-th">硬盘名</view>
+      <view class="table-th">类型</view>
+      <view class="table-th">IOPS</view>
+      <view class="table-th">读延迟</view>
+      <view class="table-th">写延迟</view>
+    </view>
+    <view wx:if="{{info.disk.length > 0}}">
+      <view wx:for="{{info.disk}}" class="table-tr" wx:key="index">
+        <view class="table-td">{{item.diskName}}</view>
+        <view class="table-td">{{item.diskType}}</view>
+        <view class="table-td">{{item.diskIops.value / 1000}}k</view>
+        <view class="table-td">{{item.diskReadDelay.result}}</view>
+        <view class="table-td">{{item.diskWriteDelay.result}}</view>
+      </view>
+    </view>
+    <view wx:else class="table-empty">暂无数据</view>
+  </view>
+
+  <view class="table-title">网络信息</view>
+  <view class="quality-info">
+    <view class="quality-tr">
+      <view class="quality-td">在线率</view>
+      <view class="quality-td">{{info.onlineRate.result}} | {{filters.toPerc(info.onlineRate.value)}}%</view>
+    </view>
+    <view class="quality-tr">
+      <view class="quality-td">NAT类型</view>
+      <view class="quality-td">{{info.nat.result}} | {{info.nat.value}}</view>
+    </view>
+    <view class="quality-tr">
+      <view class="quality-td">最大丢包率</view>
+      <view class="quality-td">{{filters.toFormat(info.maxLoss.result)}} | {{filters.toPerc(info.maxLoss.value)}}%</view>
+    </view>
+    <view class="quality-tr">
+      <view class="quality-td">最大时延</view>
+      <view class="quality-td">{{filters.toFormat(info.maxDelay.result)}} | {{filters.toPerc(info.maxDelay.value)}}%</view>
+    </view>
+    <view class="quality-tr">
+      <view class="quality-td">压测满意度</view>
+      <view class="quality-td">{{filters.toFormat(info.testSat.result)}} | {{filters.toPerc(info.testSat.value)}}%</view>
+    </view>
+  </view>
+  <view class="table">
+    <view class="table-title">网络质量</view>
+    <view class="table-tr table-tr-th">
+      <view class="table-th">线路名</view>
+      <view class="table-th">延迟(ms)</view>
+      <view class="table-th">丢包率</view>
+    </view>
+    <view wx:if="{{info.line.length > 0}}">
+      <view wx:for="{{info.line}}" class="table-tr" wx:key="index">
+        <view class="table-td">{{item.lineName}}</view>
+        <view class="table-td">{{item.lineDelay.result}} | {{filters.toFix2(item.lineDelay.value)}}</view>
+        <view class="table-td">{{item.lineLoss.result}} | {{filters.toPerc(item.lineLoss.value)}}%</view>
+      </view>
+    </view>
+    <view wx:else class="table-empty">暂无数据</view>
+  </view>
+</block>

@@ -1,0 +1,12 @@
+<!-- pages/node/netcard.wxml -->
+<wxs module="utils" src="../../utils/index.wxs"></wxs>
+<view class="netcard-groups">
+  <view block wx:for="{{netcards}}" wx:key="index" data-key="{{item.name}}" bindtap="selcetNetcard" class="netcard-btn {{item.name===selectNetCard?'active':''}}">
+    {{utils.getNetCardTitle(item)}}
+  </view>
+  <view class="no-data" wx:if="{{netcards.length === 0}}">未能获得网卡信息，请先同步</view>
+</view>
+<view class="btns">
+  <t-button class="button-item" block  bindtap="asyncInfo">同步网卡信息</t-button>
+  <t-button class="button-item" block  bindtap="manageCard">确认管理线路网卡</t-button>
+</view>

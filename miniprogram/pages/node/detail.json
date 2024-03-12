@@ -1,0 +1,14 @@
+{
+  "usingComponents": {
+    "t-tabs": "tdesign-miniprogram/tabs/tabs",
+    "t-tab-panel": "tdesign-miniprogram/tab-panel/tab-panel",
+    "t-dialog": "tdesign-miniprogram/dialog/dialog",
+    "d-settle": "./comp/settle",
+    "d-hardware": "./comp/hardware",
+    "d-quality": "./comp/quality",
+    "d-network": "./comp/network",
+    "t-tag": "tdesign-miniprogram/tag/tag",
+    "t-check-tag": "tdesign-miniprogram/check-tag/check-tag"
+  },
+  "navigationBarTitleText": "节点详情"
+}

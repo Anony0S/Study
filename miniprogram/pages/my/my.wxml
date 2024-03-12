@@ -1,0 +1,77 @@
+<!-- pages/my/my.wxml -->
+<view class="main-card" style="margin-top: {{menuButtonInfo.bottom + 10 + 'px'}}; background-color: #fff;">
+  <view class="my-info">
+    <image class="my-icon" src="../../image/user.png"></image>
+    <view class="my-phone">{{info.phone}}</view>
+  </view>
+  <view class="main-card-item" wx:for="{{moneyDataLabels}}" wx:key="index">
+    <view class="item-top">
+      <image class="item-top__image" src="{{moneyIcon[index]}}" mode="aspectFit" />
+      <view class="item-top__title">{{item}}</view>
+    </view>
+    <view class="item-bottom">
+      <text>￥</text>
+      <view>{{ moneyData[index] || '--'}}</view>
+    </view>
+  </view>
+  <t-button theme="primary" custom-style="width: 90%; margin-top: 20rpx" bindtap="showWithdrawDialog">提现</t-button>
+</view>
+
+<!-- 下面部分 -- 未显示 -->
+<view class="main-card other-box" wx:if="{{false}}">
+  <view class="other-item" bindtap="toBill">
+    <view class="other-item-icon">
+      <image src="../../image/bill.png" mode="aspectFit" />
+    </view>
+    <view class="other-item-text">
+      <text>账单明细</text>
+    </view>
+  </view>
+  <view class="other-item" bindtap="toWithdrawInfo">
+    <view class="other-item-icon">
+      <image src="../../image/message1.png" mode="aspectFit" />
+    </view>
+    <view class="other-item-text">
+      <text>提现信息</text>
+    </view>
+  </view>
+  <view class="other-item" bindtap="toUserInfo">
+    <view class="other-item-icon">
+      <image src="../../image/message2.png" mode="aspectFit" />
+    </view>
+    <view class="other-item-text">
+      <text>收款信息</text>
+    </view>
+  </view>
+  <view class="other-item" bindtap="toUpdatePassword">
+    <view class="other-item-icon">
+      <image src="../../image/setting.png" mode="aspectFit" />
+    </view>
+    <view class="other-item-text">
+      <text>修改密码</text>
+    </view>
+  </view>
+</view>
+
+<!-- Cell-item -->
+<view style="padding: 10rpx 15rpx;" wx:if="{{true}}">
+  <t-cell title="账单明细" hover arrow bindtap="toBill" leftIcon="article" />
+  <t-cell title="提现信息" hover arrow bindtap="toWithdrawInfo" leftIcon="money" />
+  <t-cell title="收款信息" hover note="去修改" arrow bindtap="toUserInfo" leftIcon="add" />
+  <t-cell title="修改密码" hover arrow bind:tap="toUpdatePassword" leftIcon="lock-on">
+  </t-cell>
+  <t-cell title="退出登录" hover bind:tap="toLogout" leftIcon="user-clear">
+  </t-cell>
+</view>
+
+<!-- 提现 Dialog -->
+<t-dialog visible="{{showWithdrawDialog}}" title="请输入提现的金额" confirm-btn="提现" cancel-btn="取消" bind:confirm="toWithdraw" bind:cancel="closeDialog">
+  <t-input slot="content" placeholder="请输入提现的金额(元)" placeholder-class="placeholder" model:value="{{withdrawMoney}}" type="digit" borderless="{{true}}" custom-style="margin-top: 50rpx;" />
+</t-dialog>
+
+<!-- 修改密码 Dialog -->
+<t-dialog visible="{{showPasswordDialog}}" title="修改密码" confirm-btn="确认修改" cancel-btn="取消" bind:confirm="updatePassword" bind:cancel="closePasswordDialog">
+  <t-input class="custom-style" slot="content" placeholder="请输入旧密码" model:value="{{oldPassword}}" type="password" />
+  <t-input slot="content" placeholder="请输入新密码" placeholder-class="placeholder" model:value="{{newPassword}}" type="password" borderless="{{false}}" />
+  <t-input slot="content" placeholder="请再次输入新密码" placeholder-class="placeholder" model:value="{{againPassword}}" type="password" borderless="{{false}}" />
+</t-dialog>

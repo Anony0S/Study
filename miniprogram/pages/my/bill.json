@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "t-tabs": "tdesign-miniprogram/tabs/tabs",
+    "t-tab-panel": "tdesign-miniprogram/tab-panel/tab-panel"
+  },
+  "navigationBarTitleText": "账单明细"
+}

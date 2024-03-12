@@ -1,0 +1,112 @@
+var deviceStatusStr = {
+  waitingForConfigNetwork: "待配置网络",
+  auditing: "审核中",
+  serving: "服务中",
+  waitingForTest: "待测试",
+  testedFailed: "测试不通",
+  abandoned: "已下机"
+};
+var deviceStatusColor = {
+  waitingForConfigNetwork: "#0052d9",
+  auditing: "#0052d9",
+  serving: "#39ca74",
+  waitingForTest: "#0052d9",
+  testedFailed: "#f75759",
+  abandoned: "#f75759"
+};
+var billingStr = {
+  '1': '日95',
+  '2': '包月'
+}
+/**
+ * 截取字符串
+ * @param str
+ * @param start 
+ * @param end 
+ */
+function substring(str, start, end) {
+  if (!str) return ''
+  return str.substring(start, end)
+}
+/**
+ * 返回金额 例: ￥12.00
+ * @param amount 金额(分)
+ */
+function getMoney(amount) {
+  if (isNaN(amount)) return '--'
+  return '￥' + (amount / 100).toFixed(2)
+}
+/**
+ * 返回金额 例: 12.00
+ * @param amount 金额(分)
+ */
+function getMoneyNoSymbol(amount) {
+  return (amount / 100).toFixed(2)
+}
+
+function getDeviceStatusStr(type) {
+  return deviceStatusStr[type] || '未配置';
+};
+function getDeviceStatusColor(type) {
+  return deviceStatusColor[type] || '#0052d9';
+}
+function getBillingStr(obj) {
+  if (!obj || !obj.strategy || !billingStr[obj.strategy + '']) {
+    return '未设置'
+  } else {
+    return billingStr[obj.strategy + '']
+  }
+};
+function getUpBandwidth(num) {
+  if (!num) return '--'
+  num = num / 1024 / 1024
+  return num.toFixed(0) > 0 ? num.toFixed(0) + 'Mb' : num.toFixed(3) + 'Mb'
+}
+
+function formatDateYMD(str) {
+  if (!str) return '--'
+  return str.split(' ').shift();
+}
+
+
+function getBandWidthStr(numStr) {
+  var num = parseInt(numStr)
+  if (isNaN(num)) return "--"
+  return (num / 1024 / 1024).toFixed(2) + 'Mbps'
+}
+
+function getVlanInfo(info, isIpType) {
+  if (isIpType) {
+    return 'vlan_id: ' + info.vlanId + ' | 掩码: ' + info.mask + ' | 网关: ' + info.gateway;
+  } else {
+    return '密码：' + info.password + ' | vlan_id: ' + info.vlanId
+  }
+}
+
+function getDialingResult(info, isIpType) {
+  if (!isIpType) {
+    return '<span style="color: ' + (info.successed ? "#2ecc71" : "#fa5555") + ';">' + (info.successed ? "已拨通" : "未拨通") + '</span>/<span style="color: ' + (info.connected ? "#2ecc71" : "#fa5555") + ';">' +
+      (info.connected ? "已联网" : "未联网") + '</span><br/><span style="color:' + (!info.ip ? "#fa5555" : "#999999") + '">' + (info.ip ? 'IP: ' + info.ip : '注: ' + info.failedReason) + '</span>';
+  } else {
+    return '<span style="color: ' + (info.connected ? "#2ecc71" : "#fa5555") + ';">' + (info.connected ? "已连通" : "未连通") + '</span>';
+  }
+};
+
+function getNetCardTitle(item) {
+  return item.name + ' | 速率:' + item.speed + 'M ' + (item.ip ? '| ' + item.ip + ' ' : '') + '| 线路数:' + item.dialingInfo.length + '条';
+};
+
+module.exports = {
+  formatDateYMD: formatDateYMD,
+  substring: substring,
+  getMoney: getMoney,
+  getMoneyNoSymbol: getMoneyNoSymbol,
+  getDeviceStatusStr: getDeviceStatusStr,
+  getDeviceStatusColor: getDeviceStatusColor,
+  getBillingStr: getBillingStr,
+  getUpBandwidth: getUpBandwidth,
+  getVlanInfo: getVlanInfo,
+  getDialingResult: getDialingResult,
+  getBandWidthStr: getBandWidthStr,
+  getNetCardTitle: getNetCardTitle
+}

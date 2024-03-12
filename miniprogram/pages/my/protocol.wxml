@@ -1,0 +1,2 @@
+<!--pages/my/protocol.wxml-->
+<web-view src="{{urls[index]}}"></web-view>

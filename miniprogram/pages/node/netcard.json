@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "管理线路",
+  "usingComponents": {
+    "t-radio": "tdesign-miniprogram/radio/radio",
+    "t-radio-group": "tdesign-miniprogram/radio-group/radio-group"
+  }
+}

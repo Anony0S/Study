@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "t-sticky": "tdesign-miniprogram/sticky/sticky"
+  },
+  "navigationBarTitleText": "提现信息"
+}

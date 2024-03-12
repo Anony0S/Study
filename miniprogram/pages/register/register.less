@@ -1,0 +1,65 @@
+/* pages/register/register.wxss */
+page {
+  .t-input__label:not(:empty) {
+    max-width: 6em;
+    font-size: 30rpx;
+  }
+
+  background-image: var(--theme-bg-linear2);
+}
+
+.t-input__label {
+  width: 120rpx;
+  margin-right: 32rpx;
+  flex: none;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 250rpx;
+
+  .login-title {
+    display: flex;
+    align-items: center;
+    font-size: 42rpx;
+    text-align: center;
+
+    &__image {
+      width: 250rpx;
+      height: 250rpx;
+    }
+  }
+
+  .btn-register {
+    width: 680rpx;
+    margin-top: 80rpx;
+    margin-bottom: 40rpx;
+  }
+
+  .btn-login {
+    height: 80rpx;
+    border: 1px solid var(--td-button-primary-border-color);
+    border-radius: 40rpx;
+    color: var(--td-button-primary-border-color);
+    font-weight: 700;
+    line-height: 80rpx;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  
+}
+
+.t-input {
+  background-color: unset !important;
+}
+
+.t-icon-base {
+  font-size: 20px;
+}
+
+.t-input__wrap--prefix {
+  align-items: center;
+}

@@ -1,0 +1,134 @@
+{
+  "description": "项目私有配置文件。此文件中的内容将覆盖 project.config.json 中的相同字段。项目的改动优先同步到此文件中。详见文档：https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html",
+  "projectname": "shengteng_mp",
+  "setting": {
+    "compileHotReLoad": true,
+    "urlCheck": false
+  },
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "带参数首页",
+          "pathName": "pages/index/index",
+          "query": "device_id=ddd",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "绑定设备",
+          "pathName": "pages/index/index",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "登录",
+          "pathName": "pages/login/login",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "主页面",
+          "pathName": "pages/main/main",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "我的",
+          "pathName": "pages/my/my",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "节点",
+          "pathName": "pages/node/node",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "节点详情",
+          "pathName": "pages/node/detail",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "监控页面",
+          "pathName": "pages/node/monitor",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "注册",
+          "pathName": "pages/register/register",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "上网线路",
+          "pathName": "pages/node/dialing",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "线路调整",
+          "pathName": "pages/dialing/edit",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "批量添加",
+          "pathName": "pages/dialing/add",
+          "query": "index=0",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "账单明细",
+          "pathName": "pages/my/bill",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "收款信息修改",
+          "pathName": "pages/my/userinfo",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "提现信息",
+          "pathName": "pages/my/withdrawinfo",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "测试详情",
+          "pathName": "pages/node/test",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
+          "name": "管理线路",
+          "pathName": "pages/node/netcard",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        }
+      ]
+    }
+  },
+  "libVersion": "3.3.4"
+}

@@ -1,0 +1,24 @@
+<!-- pages/register/register.wxml -->
+<view class="login-container">
+  <view class="login-title">
+    <image class="login-title__image" src="../../image/user.png" mode="widthFix" />
+    <view>欢迎注册联点云</view>
+  </view>
+  <view class="login-form">
+    <view style="border-radius: 20rpx; overflow: hidden;">
+      <t-input prefixIcon="phone-search" placeholder="请输入手机号" label="手机号" type="number" model:value="{{phone}}">
+      </t-input>
+      <t-input prefixIcon="lock-on" placeholder="请输入密码" label="密码" type="password" model:value="{{password}}">
+      </t-input>
+      <t-input prefixIcon="lock-on" placeholder="请再次输入密码" label="重复密码" type="password" model:value="{{repassword}}">
+      </t-input>
+    </view>
+    <view class="btn-register">
+      <t-button block theme="primary" shape="round" bindtap="toRegister" custom-style="width: 100%">注册</t-button>
+    </view>
+    <!-- <t-divider content="已经有账号？" /> -->
+    <view class="btn-login" bindtap="toLogin">
+      返回登录
+    </view>
+  </view>
+</view>

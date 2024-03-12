@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    "t-upload": "tdesign-miniprogram/upload/upload",
+    "t-picker": "tdesign-miniprogram/picker/picker",
+    "t-picker-item": "tdesign-miniprogram/picker-item/picker-item",
+    "t-message": "tdesign-miniprogram/message/message"
+  },
+  "navigationBarTitleText": "收款信息修改"
+}

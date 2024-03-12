@@ -1,0 +1,37 @@
+<!-- pages/node/dialing.wxml -->
+<wxs module="utils" src="../../utils/index.wxs"></wxs>
+<view class="header-card">
+  <view class="header-card-item" wx:for="{{headerData}}" wx:key="index" style="color: {{item.color}};">
+    <view class="header-card-num">{{item.number}}</view>
+    <view class="header-card-label">{{item.label}}</view>
+  </view>
+</view>
+<view>
+  <view class="dialing-card" wx:for="{{netcards}}" wx:key="index">
+    <view class="card-title">
+      {{'网卡: '+item.name + ' | 速率:'+item.speed+'M '+ (item.ip ? '| '+item.ip:'')+'| 线路数:'+item.dialingInfo.length+'条'}}
+    </view>
+    <view class="dialing-card-table">
+      <view class="dialing-card-tr">
+        <view class="dialing-card-th">序号</view>
+        <view class="dialing-card-th">上网信息</view>
+        <view class="dialing-card-th">{{isIpType ? '连通结果' : '拨号结果'}}</view>
+      </view>
+      <view class="dialing-card-tr" wx:for="{{item.dialingInfo}}" wx:key="index">
+        <view class="dialing-card-td">{{item.number}}</view>
+        <view class="dialing-card-td">
+          <view class="dialing-account">{{isIpType ? item.ip: item.account}}</view>
+          <view class="dialing-vlan-info">{{utils.getVlanInfo(item, isIpType)}}</view>
+        </view>
+        <view class="dialing-card-td">
+          <rich-text nodes="{{utils.getDialingResult(item, isIpType)}}"></rich-text>
+        </view>
+      </view>
+      <view class="no-data" wx:if="{{!item.dialingInfo ||item.dialingInfo.length === 0}}">暂无数据</view>
+    </view>
+  </view>
+</view>
+<view class="btn-box">
+  <t-button theme="primary" bindtap="toEdit" disabled="{{!isEditStatus}}">调整线路</t-button>
+  <t-button block bindtap="asyncInfo" loading="{{isAsyncing}}">同步网卡信息</t-button>
+</view>

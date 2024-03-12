@@ -1,0 +1,97 @@
+<!-- pages/node/comp/hardware.wxml -->
+<block wx:if="{{isDefault}}">
+  <view class="hardware-info">
+    <view class="hardware-tr">
+      <view class="hardware-td">镜像版本</view>
+      <view class="hardware-td">{{info.image_version}}</view>
+    </view>
+    <view class="hardware-tr">
+      <view class="hardware-td">设备型号</view>
+      <view class="hardware-td">{{info.device_type}}</view>
+    </view>
+  </view>
+  <view class="table-title">CPU信息</view>
+  <view class="table">
+    <view class="table-tr table-tr-th">
+      <view class="table-th">型号</view>
+      <view class="table-th">核数</view>
+      <view class="table-th">主频</view>
+    </view>
+    <view wx:if="{{cpuInfo && cpuInfo.length > 0}}">
+      <view wx:for="{{cpuInfo}}" class="table-tr" wx:key="index">
+        <view class="table-td">{{item.name}}</view>
+        <view class="table-td">{{item.core_number}}</view>
+        <view class="table-td">{{item.ghz}}</view>
+      </view>
+    </view>
+    <view wx:else class="table-empty">暂无数据</view>
+  </view>
+  <view class="table-title">磁盘信息</view>
+  <view class="table">
+    <view class="table-tr table-tr-th">
+      <view class="table-th">磁盘名</view>
+      <view class="table-th">类型</view>
+      <view class="table-th">IOPS</view>
+      <view class="table-th">容量</view>
+    </view>
+    <view wx:if="{{diskInfo && diskInfo.length > 0}}">
+      <view wx:for="{{diskInfo}}" class="table-tr" wx:key="index">
+        <view class="table-td">{{item.name}}</view>
+        <view class="table-td">{{item.type}}</view>
+        <view class="table-td">{{item.iops}}</view>
+        <view class="table-td">{{item.size}}</view>
+      </view>
+    </view>
+    <view wx:else class="table-empty">暂无数据</view>
+  </view>
+  <view class="table-title">内存信息 共:{{allMemory}}G</view>
+</block>
+<block wx:if="{{isDeviceInfo4}}">
+  <view class="hardware-info">
+    <view class="hardware-tr" wx:for="{{device4HardwareInfo}}" wx:key="index">
+      <view class="hardware-td">{{item.label}}</view>
+      <view class="hardware-td">{{item.value}}</view>
+    </view>
+  </view>
+</block>
+
+<block wx:if="{{isDeviceInfo5}}">
+  <view class="table-title">网卡信息</view>
+  <view class="table">
+    <view class="table-tr table-tr-th">
+      <view class="table-th">网卡名称</view>
+      <view class="table-th">公网ip</view>
+      <view class="table-th">运营商</view>
+      <view class="table-th">测速带宽</view>
+      <view class="table-th">NAT</view>
+    </view>
+    <view wx:if="{{info.networks && info.networks.length > 0}}">
+      <view wx:for="{{info.networks}}" class="table-tr" wx:key="index">
+        <view class="table-td">{{item.nic}}</view>
+        <view class="table-td">{{item.remote_ip}}</view>
+        <view class="table-td">{{item.isp}}</view>
+        <view class="table-td">{{item.test_bandwidth}}</view>
+        <view class="table-td">{{item.nat}}</view>
+      </view>
+    </view>
+    <view wx:else class="table-empty">暂无数据</view>
+  </view>
+  <view class="table-title">硬盘信息</view>
+  <view class="table">
+    <view class="table-tr table-tr-th">
+      <view class="table-th">磁盘名称</view>
+      <view class="table-th">是否可写</view>
+      <view class="table-th">总空间</view>
+      <view class="table-th">剩余空间</view>
+    </view>
+    <view wx:if="{{info.disks && info.disks.length > 0}}">
+      <view wx:for="{{info.disks}}" class="table-tr" wx:key="index">
+        <view class="table-td">{{item.disk}}</view>
+        <view class="table-td">{{item.writeable}}</view>
+        <view class="table-td">{{item.total_disk_size}} MB</view>
+        <view class="table-td">{{item.free_disk_size}} MB</view>
+      </view>
+    </view>
+    <view wx:else class="table-empty">暂无数据</view>
+  </view>
+</block>

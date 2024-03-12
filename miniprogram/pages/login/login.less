@@ -1,0 +1,82 @@
+/* pages/login/login.wxss */
+page {
+  .t-input__label:not(:empty) {
+    max-width: 6em;
+    font-size: 30rpx;
+  }
+
+  --td-radio-bg-color: transition;
+  --td-radio-icon-size: 38rpx;
+  --td-radio-icon-checked-color: var(--theme-color);
+  background-image: var(--theme-bg-linear2);
+}
+
+// 隐私协议
+.privacy-box {
+  display: flex;
+  align-items: center;
+  margin: 20rpx 0;
+  font-size: 16px;
+  line-height: 16px;
+
+  .text-url {
+    color: var(--theme-color);
+  }
+}
+
+.t-input__label {
+  width: 100rpx;
+  margin-right: 32rpx;
+  flex: none;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 250rpx;
+
+  .login-title {
+    display: flex;
+    align-items: center;
+    font-size: 42rpx;
+    text-align: center;
+    &__image {
+      width: 250rpx;
+      height: 250rpx;
+    }
+  }
+
+  .login-form {
+    width: 90%;
+  }
+
+  .btn-login {
+    width: 100%;
+    margin-bottom: 40rpx;
+  }
+
+  .btn-register {
+    height: 80rpx;
+    border: 1px solid var(--td-button-primary-border-color);
+    border-radius: 40rpx;
+    color: var(--td-button-primary-border-color);
+    font-weight: 700;
+    line-height: 80rpx;
+    text-align: center;
+    box-sizing: border-box;
+  }
+}
+
+.t-input {
+  background-color: unset !important;
+}
+
+.t-icon-base {
+  font-size: 20px;
+}
+
+.t-input__wrap--prefix {
+  align-items: center;
+}

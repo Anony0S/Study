@@ -1,0 +1,31 @@
+<!-- pages/node/comp/settle.wxml -->
+<wxs module="utils" src="../../../utils/index.wxs"></wxs>
+<view class="table" wx:if="{{true}}">
+  <view class="table-tr table-tr-th">
+    <view class="table-th">日期</view>
+    <block wx:if="{{info.length >0 && (info[0].biz_type === 4 || info[0].biz_type === 5 || info[0].biz_type === 8)}}">
+      <view class="table-th">95带宽
+        <view style="font-size: 12px">(Mbps)</view>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="table-th">95带宽
+        <view style="font-size: 12px">(Gbps)</view>
+      </view>
+    </block>
+    <view class="table-th">SLA</view>
+    <view class="table-th">收益(元)</view>
+  </view>
+  <view wx:for="{{info}}" class="table-tr" wx:key="index">
+    <view class="table-td" style="font-size: 14px;">{{item.settle_order_no}}</view>
+    <block wx:if="{{item.biz_type === 4 || item.biz_type === 5 || item.biz_type === 8}}">
+      <view class="table-td">{{item.bandwidth95*1024}}</view>
+    </block>
+    <block wx:else>
+      <view class="table-td">{{item.bandwidth95}}</view>
+    </block>
+    <view class="table-td">{{item.sla_reason}}</view>
+    <view class="table-td" style="color: var(--theme-money-color)">{{utils.getMoney(item.amount)}}</view>
+  </view>
+  <view class="no-data" wx:if="{{info.length === 0}}">暂无数据</view>
+</view>

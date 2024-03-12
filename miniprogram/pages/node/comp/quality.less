@@ -1,0 +1,90 @@
+/* pages/node/comp/quality.wxss */
+
+.quality-other {
+  color: #fa5555;
+}
+
+.quality-good {
+  color: #2ecc71;
+}
+
+.quality-info {
+  width: 100%;
+  border-radius: 20rpx;
+  margin: 30rpx auto;
+  font-size: 32rpx;
+  box-shadow: 0rpx 1rpx 12rpx rgba(0, 0, 0, .12);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 10rpx 20rpx;
+}
+
+.quality-tr {
+  display: flex;
+  justify-content: space-between;
+  font-size: 32rpx;
+  padding: 20rpx 10rpx;
+}
+
+.quality-tr:not(:last-child) {
+  border-bottom: 1rpx solid #dedede;
+}
+
+.quality-td:first-child {
+  border-right: 1rpx solid #dedede;
+  padding-right: 20rpx;
+  margin-right: 20rpx;
+  color: #666;
+}
+
+.table-title {
+  font-size: 32rpx;
+  margin: 20rpx;
+}
+
+.table {
+  width: 100%;
+  margin: 10rpx auto;
+  box-sizing: border-box;
+  border-radius: 20rpx;
+  font-size: 32rpx;
+  box-shadow: 0rpx 1rpx 12rpx rgba(0, 0, 0, .12);
+}
+
+.table-empty {
+  text-align: center;
+  padding: 20rpx 0;
+}
+
+.table-tr {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1rpx solid #dedede;
+  font-size: 32rpx;
+  box-sizing: content-box;
+
+  &:nth-child(1) {
+    border-top: unset;
+  }
+}
+
+.table-th {
+  color: #666;
+}
+
+.table-th,
+.table-td {
+  flex: 1;
+  text-align: center;
+  padding: 10rpx 0;
+  font-size: 14px;
+}
+
+.table-tr-th {
+  background-image: var(--theme-table-bg-linear);
+  border-top-right-radius: 20rpx;
+  border-top-left-radius: 20rpx;
+  font-weight: bold;
+  padding: 6rpx 0;
+}

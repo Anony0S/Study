@@ -1,0 +1,89 @@
+/* pages/my/bill.wxss */
+page {
+  background-color: #fff;
+}
+.date-section {
+  padding: 0 20rpx;
+
+  .picker-box {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    height: 80rpx;
+    align-items: center;
+    box-sizing: border-box;
+    border-radius: 10rpx;
+    box-shadow: 0rpx 1rpx 12rpx rgba(0, 0, 0, .12);
+    margin-top: 10rpx;
+
+    &-start {
+      flex: 1;
+    }
+
+    &-end {
+      flex: 1;
+    }
+  }
+}
+.picker {
+  background-color: white;
+  font-size: 14px;
+  margin: 20rpx;
+  padding: 10rpx;
+}
+
+.list-item {
+  width: 720rpx;
+  border-radius: 20rpx;
+  margin: 30rpx auto;
+  box-shadow: 0rpx 1rpx 12rpx rgba(0, 0, 0, .12);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 10rpx 20rpx;
+  background-color: white;
+  font-size: 14px;
+}
+.list-item-title {
+  width: 150rpx;
+  flex-shrink: 0;
+  color: #999;
+}
+.list-item-status {
+  color: #f56c6c;
+  background: #fef0f0;
+  border: 1px solid #fde2e2;
+  border-radius: 10rpx;
+  padding: 0 6rpx;
+  margin-left: 10rpx;
+}
+.list-item-status-1 {
+  color: #909399;
+  background: #f4f4f5;
+  border-color: #e9e9eb;
+}
+
+.list-item-tr {
+  display: flex;
+}
+.list-item-tr:first-child {
+  line-height: 2;
+}
+.list-item-table {
+  display: flex;
+  margin-top: 20rpx;
+}
+.list-item-table-label {
+  color: #999;
+}
+.list-item-table-symbol {
+  font-size: 12px;
+}
+.list-item-table-item {
+  flex: 1;
+}
+.no-data {
+  color: #999;
+  padding: 10rpx 0 30rpx 0;
+  text-align: center;
+}

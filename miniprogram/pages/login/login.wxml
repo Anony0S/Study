@@ -1,0 +1,26 @@
+<!-- pages/login/login.wxml -->
+<view class="login-container">
+  <view class="login-title">
+    <image class="login-title__image" src="../../image/user.png" mode="widthFix" />
+    <view>欢迎登录联点云</view>
+  </view>
+  <view class="login-form">
+    <view style="border-radius: 20rpx; overflow: hidden;">
+      <t-input prefixIcon="phone-search" placeholder="请输入手机号" label="手机号" type="number" model:value="{{phone}}">
+      </t-input>
+      <t-input prefixIcon="lock-on" placeholder="请输入密码" label="密码" type="password" model:value="{{password}}">
+      </t-input>
+    </view>
+    <view class="privacy-box">
+      <t-radio block="{{false}}" value="0" checked="{{isChecked}}" bind:change="onChange" />
+      阅读并同意<text class="text-url" data-index="0" bindtap="toProtocol">《用户协议》</text>与<text class="text-url" data-index="1" bindtap="toProtocol">《隐私政策》</text>
+    </view>
+    <view class="btn-login">
+      <t-button block theme="primary" shape="round" bindtap="toLogin" custom-style="width: 100%">登录</t-button>
+    </view>
+    <!-- <t-divider content="还没有账号？" /> -->
+    <view class="btn-register" bindtap="toRegister">
+      注册
+    </view>
+  </view>
+</view>

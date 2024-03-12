@@ -1,0 +1,26 @@
+<view class="block {{!title && 'block_notitle'}}">
+  <view wx:if="{{ title || desc }}" class="block__heander">
+    <view wx:if="{{ title }}" class="block__heander-title">{{ title }}</view>
+    <view wx:if="{{ desc }}" class="block__heander-desc {{!title && 'block_subtitle' }}"
+      >{{ desc }}</view
+    >
+    <!-- <slot name="title-right" /> -->
+  </view>
+  <view wx:for="{{ operList }}" wx:for-item="operItem" wx:key="oper" class="block__oper">
+    <view wx:if="{{ operItem.title }}" class="block__oper-subtitle">{{ operItem.title }}</view>
+    <view wx:for="{{ operItem.btns }}" wx:for-item="btnItem" wx:key="btn">
+      <t-button
+        t-class="block__oper-btn"
+        size="large"
+        block
+        data-type="{{ btnItem.type }}"
+        bind:tap="clickHandle"
+      >
+        {{ btnItem.text }}
+      </t-button>
+    </view>
+  </view>
+  <view class="block__slot {{padding ? 'with-padding' : ''}}">
+    <slot />
+  </view>
+</view>

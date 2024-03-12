@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "t-switch": "tdesign-miniprogram/switch/switch"
+  },
+  "navigationBarTitleText": "调整线路"
+}

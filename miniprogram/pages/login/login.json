@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "t-divider": "tdesign-miniprogram/divider/divider",
+    "t-radio": "tdesign-miniprogram/radio/radio"
+  },
+  "navigationBarTitleText": "登录",
+  "navigationStyle": "custom"
+}

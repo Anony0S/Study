@@ -1,0 +1,45 @@
+<view class="main-container">
+  <view>
+    <view class="main-header">
+      <view class="main-header-title">收益数据</view>
+    </view>
+  </view>
+  <view>
+    <view class="money-card">
+      <view class="money-card-item" wx:for="{{moneyData2Labels}}" wx:key="index">
+        <view class="money-card-money">
+          {{moneyData2[index] !== underfind ? moneyData2[index] : '--'}}
+        </view>
+        <view class="money-card-label">{{item}}</view>
+      </view>
+    </view>
+    <view class="money-card">
+      <view class="money-card-item" wx:for="{{moneyDataLabels}}" wx:key="index">
+        <view class="money-card-money">
+          {{moneyData[index] !== underfind ? moneyData[index] : '--'}}
+        </view>
+        <view class="money-card-label">{{item}}</view>
+      </view>
+    </view>
+  </view>
+  <view>
+    <view class="main-header">
+      <view class="main-header-title">流量监控</view>
+      <view bind:tap="onClickPicker">{{ispTitleCurrentValue || '请选择运营商'}}</view>
+      <picker mode="date" value="{{time}}" bindchange="bindTimeChange">
+        <view class="picker">时间: {{time}}</view>
+      </picker>
+    </view>
+    <view class="chart-container {{ noChart ? 'chart-no-data': ''}}">
+      <ec-canvas id="mychart" canvas-id="mychart" ec="{{ec}}"></ec-canvas>
+    </view>
+    <view class="chart-container no-data" wx:if="{{noChart}}">暂无数据</view>
+  </view>
+  <view class="camera-container" wx:if="{{false}}">
+    <t-button theme="light" icon="scan" variant="outline" block bindtap="scanCode">扫描添加设备</t-button>
+  </view>
+</view>
+<!-- 选择运营商 -->
+<t-picker visible="{{ispTitleVisible}}" value="{{ispTitleData}}" data-key="{{PICKER_KEY.ISP_TITLE}}" title="请选择运营商" cancelBtn="取消" confirmBtn="确认" bindchange="onPickerChange" bindpick="onColumnChange">
+  <t-picker-item options="{{isps}}"></t-picker-item>
+</t-picker>

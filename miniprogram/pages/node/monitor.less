@@ -1,0 +1,49 @@
+/* pages/node/monitor.wxss */
+page {
+  background-color: #fff;
+}
+
+ec-canvas {
+  width: 100%;
+  height: 400rpx;
+}
+
+.date-section {
+  padding: 0 20rpx;
+
+  .picker-box {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    height: 80rpx;
+    align-items: center;
+    // border: 1px solid var(--theme-color);
+    box-sizing: border-box;
+    border-radius: 10rpx;
+    box-shadow: 0rpx 1rpx 12rpx rgba(0, 0, 0, .12);
+    margin-top: 10rpx;
+
+    &-start {
+      flex: 1;
+    }
+
+    &-end {
+      flex: 1;
+    }
+  }
+}
+
+.tabs-box {
+  padding: 10rpx;
+}
+
+.picker {
+  background-color: white;
+  font-size: 14px;
+  margin: 20rpx;
+  padding: 10rpx;
+}
+
+.tab-container {
+  height: calc(100vh - 96rpx - 80rpx - 40rpx);
+}

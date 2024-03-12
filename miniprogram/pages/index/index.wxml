@@ -1,0 +1,167 @@
+<!-- index.wxml -->
+<view class="camera-container">
+  <t-button theme="light" block wx:if="{{!isShowCamera}}" icon="scan"  bindtap="openCamera" custom-style="background-color: #fff">
+    扫描添加设备
+  </t-button>
+</view>
+<view class="form-container" wx:if="{{!isShowCamera}}">
+  <view class="form">
+    <t-input placeholder="请选择业务版本" label="业务版本" suffixIcon="chevron-right" bind:tap="onClickPicker" data-key="{{PICKER_KEY.BIZ_TYPE_TITLE}}" value="{{biztypeTitleCurrentValue}}" disabled readonly>
+      <text slot="label">
+        <text style="color: #e34d59">*</text>
+      </text>
+    </t-input>
+    <t-input wx:if="{{form.biz_type === 1}}" placeholder="请选择业务目标" label="业务目标" suffixIcon="chevron-right" bind:tap="onClickPicker" data-key="{{PICKER_KEY.PLAN_TASK_TITLE}}" value="{{planTaskTitleCurrentValue}}" disabled readonly>
+      <text slot="label">
+        <text style="color: #e34d59">*</text>
+      </text>
+    </t-input>
+    <t-input placeholder="请输入设备ID" label="设备ID" data-key="device_id" bindchange="inputChange" model:value="{{form.device_id}}">
+      <text slot="label">
+        <text style="color: #e34d59">*</text>
+      </text>
+    </t-input>
+    <t-input placeholder="请填写备注(不超20字符)" data-key="remark" bindchange="inputChange" maxcharacter="20" label="备注">
+      <text slot="label">
+        <text style="color: #e34d59">*</text>
+      </text>
+    </t-input>
+    <t-input placeholder="单位Mbps,进制1024" data-key="up_bandwidth" bindchange="inputChange" type="number" label="单条上行">
+      <text slot="label">
+        <text style="color: #e34d59">*</text>
+      </text>
+    </t-input>
+    <t-input placeholder="请输入线路数量" data-key="line_number" bindchange="inputChange" type="number" label="线路数量" suffix="总:{{total_up_bandwidth}}Gbps">
+      <text slot="label">
+        <text style="color: #e34d59">*</text>
+      </text>
+    </t-input>
+    <t-input placeholder="请选择地域" label="地域" suffixIcon="chevron-right" bind:tap="onClickPicker" data-key="{{PICKER_KEY.ADDRESS_TITLE}}" value="{{addressTitleCurrentValue}}" disabled readonly>
+      <text slot="label">
+        <text style="color: #e34d59">*</text>
+      </text>
+    </t-input>
+    <t-input placeholder="请选择运营商" bind:tap="onClickPicker" data-key="{{PICKER_KEY.ISP_TITLE}}" label="运营商" suffixIcon="chevron-right" value="{{ispTitleCurrentValue}}" disabled readonly>
+      <text slot="label">
+        <text style="color: #e34d59">*</text>
+      </text>
+    </t-input>
+    <t-input wx:if="{{form.biz_type !== 4 && form.biz_type !== 5 && form.biz_type !== 8}}" placeholder="请选择上网方式" bind:tap="onClickPicker" data-key="{{PICKER_KEY.DIALING_TITLE}}" label="上网方式" suffixIcon="chevron-right" value="{{dialingTitleCurrentValue}}" disabled readonly>
+      <text slot="label">
+        <text style="color: #e34d59">*</text>
+      </text>
+    </t-input>
+    <t-input wx:if="{{form.biz_type === 5}}" placeholder="请选择来源" bind:tap="onClickPicker" data-key="{{PICKER_KEY.REFER_TITLE}}" label="slot" suffixIcon="chevron-right" value="{{referTitleCurrentValue}}" disabled readonly>
+      <text slot="label">
+        <text style="color: #e34d59">*</text>
+        <text>来源</text>
+      </text>
+    </t-input>
+    <view wx:if="{{form.biz_type !== 4 && form.biz_type !== 5 && form.biz_type !== 8}}" class="t-input t-size-small t-bordered t-class">
+      <view class="t-input__label">
+        <text>
+          <text style="color: #e34d59">*</text>
+          <text>公网/内网</text>
+        </text>
+      </view>
+      <view class="t-input__wrap">
+        <radio-group class="t-input-radio-group" bindchange="radioChange" data-key="nat_type">
+          <label class="t-input-radio-item">
+            <radio value="public" checked="true" color="var(--theme-color)"></radio>
+            <view>公网</view>
+          </label>
+          <label class="t-input-radio-item">
+            <radio value="inner" color="var(--theme-color)"></radio>
+            <view>内网</view>
+          </label>
+        </radio-group>
+      </view>
+    </view>
+    <!-- <view class="t-input t-size-small t-bordered t-class">
+      <view class="t-input__label">
+        <text><text style="color: #e34d59"> *</text>机房类型 </text>
+      </view>
+      <view class="t-input__wrap">
+        <radio-group class="t-input-radio-group">
+          <label class="t-input-radio-item">
+            <radio></radio><view>IDC机房</view>
+          </label>
+          <label class="t-input-radio-item">
+            <radio></radio><view>城域网机房</view>
+          </label>
+          <label class="t-input-radio-item">
+            <radio></radio><view>托管机房</view>
+          </label>
+        </radio-group>
+      </view>
+    </view>
+    <view class="t-input t-size-small t-bordered t-class">
+      <view class="t-input__label">
+        <text><text style="color: #e34d59"> *</text>UPS </text>
+      </view>
+      <view class="t-input__wrap">
+        <radio-group class="t-input-radio-group">
+          <label class="t-input-radio-item">
+            <radio></radio><view>有UPS</view>
+          </label>
+          <label class="t-input-radio-item">
+            <radio></radio><view>无UPS</view>
+          </label>
+        </radio-group>
+      </view>
+    </view> -->
+    <view wx:if="{{form.biz_type !== 4 && form.biz_type !== 5 && form.biz_type !== 8}}" class="t-input t-size-small t-bordered t-class">
+      <view class="t-input__label">
+        <text>
+          <text style="color: #e34d59">*</text>
+          <text>IP协议栈</text>
+        </text>
+      </view>
+      <view class="t-input__wrap">
+        <radio-group class="t-input-radio-group" bindchange="radioChange" data-key="ip_protocol">
+          <label class="t-input-radio-item">
+            <radio value="双栈" checked="true" color="var(--theme-color)"></radio>
+            <view>双栈</view>
+          </label>
+          <label class="t-input-radio-item">
+            <radio value="IPV4" color="var(--theme-color)"></radio>
+            <view>IPV4</view>
+          </label>
+          <label class="t-input-radio-item">
+            <radio value="IPV6" color="var(--theme-color)"></radio>
+            <view>IPV6</view>
+          </label>
+        </radio-group>
+      </view>
+    </view>
+  </view>
+  <view style="margin-top: 40rpx;">
+    <t-button block theme="primary" bindtap="toBind">立即绑定</t-button>
+  </view>
+</view>
+
+<!-- 选择地域 -->
+<t-picker visible="{{addressTitleVisible}}" value="{{addressTitleData}}" data-key="{{PICKER_KEY.ADDRESS_TITLE}}" title="请选择地域" cancelBtn="取消" confirmBtn="确认" bindchange="onPickerChange" bindpick="onColumnChange">
+  <t-picker-item options="{{provinces}}"></t-picker-item>
+  <t-picker-item options="{{citys}}"></t-picker-item>
+</t-picker>
+<!-- 选择运营商 -->
+<t-picker visible="{{ispTitleVisible}}" value="{{ispTitleData}}" data-key="{{PICKER_KEY.ISP_TITLE}}" title="请选择运营商" cancelBtn="取消" confirmBtn="确认" bindchange="onPickerChange">
+  <t-picker-item options="{{isps}}"></t-picker-item>
+</t-picker>
+<!-- 选择上网方式 -->
+<t-picker visible="{{dialingTitleVisible}}" value="{{dialingTitleData}}" data-key="{{PICKER_KEY.DIALING_TITLE}}" title="请选择上网方式" cancelBtn="取消" confirmBtn="确认" bindchange="onPickerChange">
+  <t-picker-item options="{{dialings}}"></t-picker-item>
+</t-picker>
+<!-- 选择业务版本 -->
+<t-picker visible="{{biztypeTitleVisible}}" value="{{biztypeTitleData}}" data-key="{{PICKER_KEY.BIZ_TYPE_TITLE}}" title="请选择业务版本" cancelBtn="取消" confirmBtn="确认" bindchange="onPickerChange">
+  <t-picker-item options="{{bizTypes}}"></t-picker-item>
+</t-picker>
+<!-- 选择运营商 -->
+<t-picker visible="{{planTaskTitleVisible}}" value="{{planTaskTitleData}}" data-key="{{PICKER_KEY.PLAN_TASK_TITLE}}" title="请选择业务目标" cancelBtn="取消" confirmBtn="确认" bindchange="onPickerChange">
+  <t-picker-item options="{{planTasks}}"></t-picker-item>
+</t-picker>
+<!-- 选择来源 -->
+<t-picker visible="{{referTitleVisible}}" value="{{referTitleData}}" data-key="{{PICKER_KEY.REFER_TITLE}}" title="请选择来源" cancelBtn="取消" confirmBtn="确认" bindchange="onPickerChange">
+  <t-picker-item options="{{refers}}"></t-picker-item>
+</t-picker>

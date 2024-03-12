@@ -1,0 +1,70 @@
+<!-- pages/node/detail.wxml -->
+<wxs module="utils" src="../../utils/index.wxs"></wxs>
+
+<!-- 节点信息 -->
+<view class="node-card">
+  <view class="node-id-box">
+    <t-tag variant="outline" custom-style="margin-right: 10rpx;">备注</t-tag>
+
+    <!-- <text>{{info.remark}}</text> -->
+    <text class="node-id-box--text">{{info.remark}}</text>
+  </view>
+  <view class="node-id-box">
+    <t-tag variant="outline" custom-style="margin: 15rpx 15rpx 10rpx 0;">节点ID</t-tag>
+    <text class="id--text">{{info.device_id}}</text>
+    <t-tag variant="light" theme="success" custom-style="margin-left: 10rpx" bindtap="copy" wx:if="{{info.device_id}}">复制</t-tag>
+  </view>
+  <view class="node-id-box">
+    <t-tag variant="outline" custom-style="margin-right: 10rpx">昨日收益</t-tag>
+    <text class="money--text">{{utils.getMoney(info.yesterday_settle)}}</text>
+  </view>
+
+  <view class="node-status">
+    <view class="node-title">
+      <view class="node-title-text">绑定时间</view>
+      <view class="node-title-content">{{utils.substring(info.ctime,0,10)}}</view>
+    </view>
+    <view class="node-title">
+      <view class="node-title-text">
+        网络(
+        <text class="status-{{info.online_status === 'online'?'online':'offline'}}">{{info.online_status === 'online'?'在线':'离线'}}</text>
+        )
+      </view>
+      <t-button theme="primary" bindtap="toMonitor" block size="small" custom-style="width: 150rpx" wx:if="{{info.online_status === 'online'}}">监控</t-button>
+    </view>
+    <view class="node-title">
+      <view class="node-title-text">当前阶段</view>
+      <view class="node-title-content">{{deviceStatusStr[info.device_status]}}</view>
+    </view>
+  </view>
+</view>
+
+<view class="tabs-box">
+  <t-tabs value="{{currentTab}}" bind:change="onTabsChange" space-evenly="{{false}}">
+    <t-tab-panel label="收益" value="0">
+      <d-settle deviceId="{{info.device_id}}"></d-settle>
+    </t-tab-panel>
+    <t-tab-panel label="硬件信息" value="1">
+      <d-hardware info="{{info}}"></d-hardware>
+    </t-tab-panel>
+    <t-tab-panel label="网络信息" value="2">
+      <d-network info="{{info}}" bind:open="openDialog" bind:obdlog="openUpBandwidthDialog"></d-network>
+    </t-tab-panel>
+    <t-tab-panel label="质量信息" value="3">
+      <d-quality deviceId="{{info.device_id}}"></d-quality>
+    </t-tab-panel>
+    <t-tab-panel label="管理" value="4">
+      <view class="node-remove">
+        <t-button theme="danger" bindtap="removeDialog" block size="small">删除该设备</t-button>
+      </view>
+    </t-tab-panel>
+  </t-tabs>
+</view>
+
+<t-dialog visible="{{showTestDialog}}" title="开始带宽测试" confirm-btn="开始测试" cancel-btn="取消" bind:confirm="startTest" bind:cancel="closeDialog">
+  <t-input slot="content" placeholder="请输入单条上行带宽(Mbps)" type="number" placeholder-class="placeholder" model:value="{{limit}}" type="digit" borderless="{{false}}" />
+</t-dialog>
+
+<t-dialog visible="{{showEditUpBandwidthDialog}}" title="修改上报带宽" confirm-btn="修改" cancel-btn="取消" bind:confirm="updateUpBandwidth" bind:cancel="closeUpBandwidthDialog">
+  <t-input slot="content" placeholder="请输入单条上行带宽(Mbps)" type="number" placeholder-class="placeholder" model:value="{{upBandwidth}}" type="digit" borderless="{{false}}" />
+</t-dialog>

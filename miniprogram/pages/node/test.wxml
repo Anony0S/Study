@@ -1,0 +1,48 @@
+<!-- pages/node/test.wxml -->
+<wxs module="utils" src="../../utils/index.wxs"></wxs>
+<block wx:for="{{data}}" wx:key="key">
+  <view class="test-info">
+    <view class="test-tr">
+      <view class="test-td">压测类型</view>
+      <view class="test-td">{{item.type === 'drop'?'丢包测试':'极限测试'}}</view>
+    </view>
+    <view class="test-tr">
+      <view class="test-td">压测最大</view>
+      <view class="test-td">{{utils.getBandWidthStr(item.maxTestBandwidth)}}</view>
+    </view>
+    <view class="test-tr">
+      <view class="test-td">压测平均</view>
+      <view class="test-td">{{utils.getBandWidthStr(item.avgTestBandwidth)}}</view>
+    </view>
+    <view class="test-tr">
+      <view class="test-td">TCP重传率</view>
+      <view class="test-td">{{item.tcpRetransmissionRatio}}</view>
+    </view>
+    <view class="test-tr">
+      <view class="test-td">测试时间</view>
+      <view class="test-td">{{item.time}}</view>
+    </view>
+    <view class="test-tr">
+      <view class="test-td">测试用时(s)</view>
+      <view class="test-td">{{item.duration}}</view>
+    </view>
+  </view>
+  <view class="table">
+    <view class="table-tr table-tr-th">
+      <view class="table-th">线路</view>
+      <view class="table-th">平均速率</view>
+      <view class="table-th">公网IP</view>
+      <view class="table-th">网络延迟</view>
+      <view class="table-th">丢包率</view>
+    </view>
+    <view wx:for="{{item.lineQuality}}" class="table-tr" wx:for-item="it" wx:key="index">
+      <view class="table-td">{{it.name}}</view>
+      <view class="table-td">{{utils.getBandWidthStr(it.avgUpBandwidth)}}</view>
+      <view class="table-td">{{it.ip}}</view>
+      <view class="table-td">{{it.networkDelay}}</view>
+      <view class="table-td">{{it.packetLossRate}}</view>
+    </view>
+    <view class="no-data" wx:if="{{!data.lineQuality || data.lineQuality.length === 0}}">暂无数据</view>
+  </view>
+</block>
+<view class="no-data" wx:if="{{!data || data.length === 0}}">暂无测试数据</view>

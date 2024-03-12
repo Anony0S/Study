@@ -1,0 +1,61 @@
+<wxs module="utils" src="../../utils/index.wxs"></wxs>
+
+<!-- 上半部分 -->
+<view class="header-box">
+  <view class="header-select-box">
+    <t-dropdown-menu>
+      <t-dropdown-item label="{{selectBizTypeLabel}}" options="{{bizTypes}}" value="{{selectBizTypeValue}}" bindchange="handleBizTypeSelect" />
+      <t-dropdown-item label="{{selectLabel}}" options="{{selectOptions}}" value="{{selectValue}}" bindchange="handleSingleSelect" />
+    </t-dropdown-menu>
+  </view>
+
+  <view class="seach-box">
+    <view class="seach-box-input">
+      <t-search model:value="{{seachText}}" placeholder="请输入节点ID" bind:submit="search" bind:clear="search" />
+    </view>
+    <!-- <view class="seach-box-add">
+      <image class="seach-box-add__image" src="../../image/icon_add.png" mode="aspectFit" bind:tap="toAddPage" />
+    </view> -->
+  </view>
+</view>
+
+<scroll-view scroll-y="true" class="scroll-view" enable-back-to-top="true" refresher-enabled="true" bindscrolltolower="loadMore" bindrefresherrefresh="refresh" refresher-triggered="{{refreshing}}">
+  <view wx:if="{{!list || list.length === 0}}">
+    <t-empty custom-style="padding-top: 200rpx" icon="info-circle-filled" description="暂无数据" />
+  </view>
+  <view class="node-card" wx:for="{{list}}" bindtap="toDetail" data-info="{{item}}" wx:key="index">
+    <view class="node-header">
+      <view class="node-status {{item.online_status}}"></view>
+      <view class="node-device-id">{{item.device_id}}</view>
+      <view class="node-device-status">{{utils.getDeviceStatusStr(item.device_status)}}</view>
+    </view>
+    <view class="node-remark">
+      {{utils.getBillingStr(item.device_billing_extend)}} | {{item.remark}} | {{item.province}}{{item.city}}
+    </view>
+    <view class="node-table">
+      <block wx:if="{{item.biz_type != 4 && item.biz_type != 5}}">
+        <view class="node-table-item">
+          <view class="node-table-label">总带宽量</view>
+          <view class="node-table-money">{{utils.getUpBandwidth(item.up_bandwidth)}}</view>
+        </view>
+      </block>
+      <view class="node-table-item">
+        <view class="node-table-label">昨日收益</view>
+        <view class="node-table-money" style="color: var(--theme-money-color)">{{utils.getMoney(item.yesterday_settle)}}</view>
+      </view>
+      <view class="node-table-item">
+        <view class="node-table-label">绑定时间</view>
+        <view class="node-table-money">{{utils.formatDateYMD(item.ctime)}}</view>
+      </view>
+    </view>
+  </view>
+  <view style="height: 30px;">
+    <t-divider wx:if="{{list.length > 0}}" content="没有了"/>
+  </view>
+
+</scroll-view>
+
+<t-fab icon="scan" bind:click="toScan" aria-label="扫描"></t-fab>
+<t-popup visible="{{visible}}" bind:visible-change="onVisibleChange" placement="right">
+  <view class="block block--right">test</view>
+</t-popup>
