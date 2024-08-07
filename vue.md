@@ -115,45 +115,45 @@ if (to.matched.length === 0) {  //如果未匹配到路由
 
     - ```js
       beforeAvatarUpload(file) {
-                  // === 限制格式和大小
-                  const isTypeTrue = /^image\/(jpeg|png|jpg)$/.test(file.type);
-                  const isLt = file.size / 1024 / 1024 < this.imgSize;
-                  if (!isTypeTrue) {
-                      this.$message.error("请上传指定格式图片");
-                      return false;
-                  }
-                  if (!isLt) {
-                      this.$message.error(`请上传大小在${this.imgSize}M内的图片`);
-                      return false;
-                  }
-                  // === 限制尺寸
-                  let _this = this;
-                  const isSize = new Promise(function (resolve, reject) {
-                      let width = _this.width; // 限制图片尺寸
-                      let height = _this.height;
-                      // URL对象是硬盘（SD卡等）指向文件的一个路径
-                      let _URL = window.URL || window.webkitURL;
-                      let img = new Image();
-                      //设置src才能取到图片宽高等属性
-                      img.src = _URL.createObjectURL(file);
-                      img.onload = function () {
-                          console.log("Width:", img.width, "height:", img.height);
-                          let valid = img.width <= width && img.height <= height;
-                          // let valid = true;
-                          valid ? resolve(img.src) : reject();
-                      };
-                  }).then(
-                      (res) => {
-                          _this.imageUrl = res; // 图片回显
-                          return file;
-                      },
-                      () => {
-                          _this.$message.error(`上传图片与要求尺寸不符,请重新上传`);
-                          return Promise.reject();
-                      }
-                  );
-                  return isTypeTrue && isLt && isSize;
+          // === 限制格式和大小
+          const isTypeTrue = /^image\/(jpeg|png|jpg)$/.test(file.type);
+          const isLt = file.size / 1024 / 1024 < this.imgSize;
+          if (!isTypeTrue) {
+              this.$message.error("请上传指定格式图片");
+              return false;
+          }
+          if (!isLt) {
+              this.$message.error(`请上传大小在${this.imgSize}M内的图片`);
+              return false;
+          }
+          // === 限制尺寸
+          let _this = this;
+          const isSize = new Promise(function (resolve, reject) {
+              let width = _this.width; // 限制图片尺寸
+              let height = _this.height;
+              // URL对象是硬盘（SD卡等）指向文件的一个路径
+              let _URL = window.URL || window.webkitURL;
+              let img = new Image();
+              //设置src才能取到图片宽高等属性
+              img.src = _URL.createObjectURL(file);
+              img.onload = function () {
+                  console.log("Width:", img.width, "height:", img.height);
+                  let valid = img.width <= width && img.height <= height;
+                  // let valid = true;
+                  valid ? resolve(img.src) : reject();
+              };
+          }).then(
+              (res) => {
+                  _this.imageUrl = res; // 图片回显
+                  return file;
               },
+              () => {
+                  _this.$message.error(`上传图片与要求尺寸不符,请重新上传`);
+                  return Promise.reject();
+              }
+          );
+          return isTypeTrue && isLt && isSize;
+      },
       ```
 
 - 参考文章：https://juejin.cn/post/6844904150833037325#comment
