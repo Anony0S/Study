@@ -60,7 +60,7 @@
 
 效果：
 
-​	　![image-20230628133207813](CSS.assets/image-20230628133207813.png)
+![image-20230628133207813](./assets/CSS/image-20230628133207813.png)
 
 
 
@@ -101,7 +101,7 @@
 
 ## 多列布局图片不铺满
 
-![image-20230628133216876](CSS.assets/image-20230628133216876.png)
+![image-20230628133216876](./assets/CSS/image-20230628133216876.png)
 
 给图片添加属性`vertical-align: middle;`
 
@@ -128,3 +128,68 @@ display: -webkit-box !important;
 
 - [参考一 CSDN (推荐)](https://blog.csdn.net/a460550542/article/details/122111518)
 - [参考二 CSDN](https://blog.csdn.net/qq_36604536/article/details/124612795)
+
+
+
+
+
+## 滚动条（原生&el-table）
+
+- 浏览器默认滚动条修改
+
+  ```css
+  /* 修改滚动条轨道 */
+  ::-webkit-scrollbar {
+    width: 10px; /* 滚动条宽度 */
+  }
+  
+  /* 修改滚动条轨道背景 */
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1; /* 轨道背景颜色 */
+  }
+  
+  /* 修改滚动条滑块 */
+  ::-webkit-scrollbar-thumb {
+    background: #888; /* 滑块颜色 */
+  }
+  
+  /* 设置滚动条边框 */
+  ::-webkit-scrollbar-thumb {
+    border-radius: 5px; /* 滑块圆角 */
+  }
+  ```
+
+- el-table 滚动条修改
+
+  ```scss
+  <style lang="scss">
+  .el-scrollbar {
+  	
+  	.el-scrollbar__bar.is-horizontal {
+  		height: 14px; // 添加横向高度
+  	}
+  	.el-scrollbar__bar.is-vertical {
+  		width: 14px; // 添加纵向宽度
+  	}
+    // 横向滚动条
+    .el-scrollbar__bar.is-horizontal .el-scrollbar__thumb {
+      opacity: 1; // 默认滚动条自带透明度
+      height: 14px; // 横向滑块的宽度
+      border-radius: 2px; // 圆角度数
+      background-color: rgba(136, 219, 255, 1); // 滑块背景色
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.15); // 滑块阴影
+    }
+    // 纵向滚动条
+    .el-scrollbar__bar.is-vertical .el-scrollbar__thumb {
+      opacity: 1;
+      width: 14px; // 纵向滑块的宽度
+      border-radius: 2px;
+      background-color: rgba(136, 219, 255, 1);
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+    }
+  </style>
+  ```
+
+  
+
+  

@@ -83,7 +83,7 @@
 ## NodeJS安装
 
 ```shell
-curl -sL https://deb.nodesource.com/setup_14.x| sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_20.x| sudo -E bash -
 # 注意安装版本
 ```
 
@@ -273,13 +273,11 @@ mysql -u root -p
 
 - **添加软件源时**
 
-   ![image-20230117104340039](C:\Users\Admin\Documents\Typora\VPS.assets\image-20230117104340039.png)
-
-  ```shell
+   ```shell
   sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 425956BB3E31DF51
   sudo apt update
   ```
-
+  
 - **设置远程连接权限**
 
   - 查看user表
@@ -1028,10 +1026,6 @@ http {
 }
 
 ```
-
-<iframe src="//player.bilibili.com/player.html?aid=749648684&bvid=BV19C4y1F7na&cid=1364123480&p=1&autoplay=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" height="500"> </iframe>
-
-![image-20231214182331893](./assets/image-20231214182331893.png)
 
 
 

@@ -90,16 +90,16 @@ if (to.matched.length === 0) {  //如果未匹配到路由
 - **限制格式**
 
   1. `accept：`对文件上传控件中可选择的文件类型进行限制
-     - ![image-20230628133057826](Vue.assets/image-20230628133057826.png)
+     - ![image-20230628133057826](./assets/Vue/image-20230628133057826.png)
      - [唯一文件类型说明符](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input/file#%E5%94%AF%E4%B8%80%E6%96%87%E4%BB%B6%E7%B1%BB%E5%9E%8B%E8%AF%B4%E6%98%8E%E7%AC%A6)
   2. `before-upload`上传前钩子函数，拿到上传前文件，通过文件`type`属性获取文件类型进行判断
-     - ![image-20221112101536089](C:\Users\Admin\Documents\Typora\vue.assets\image-20221112101536089.png)
+     - ![image-20221112101536089](.\assets\Vue\image-20221112101536089.png)
 
 - **限制大小**
 
   - 原理同上，通过`before-upload`拿到上传文件，通过文件`size`属性获取文件大小进行判断
 
-    ![image-20221112101716883](C:\Users\Admin\Documents\Typora\vue.assets\image-20221112101716883.png)
+    ![image-20221112101536089](./assets/Vue/image-20221112101536089.png)
 
 - **实现对上传图片的宽高进行限制**
 
@@ -216,7 +216,7 @@ if (to.matched.length === 0) {  //如果未匹配到路由
 
 - 单独上传接口，上传时需要对应的点位ID，点位不需要提供增改字段
 
-  ![image-20230628133109453](Vue.assets/image-20230628133109453.png) 
+  ![image-20230628133109453](./assets/Vue/image-20230628133109453.png) 
 
 ### 注意事项
 
@@ -488,12 +488,12 @@ module.exports = {
 
 ⭐此方法严重弊端：再次打开会有校验
 
-![image-20230628133122238](Vue.assets/image-20230628133122238.png)
+![image-20230628133122238](./assets/Vue/image-20230628133122238.png)
 
 - 将校验规则写成一个函数，使用的时候传参
 - 参数放在规则后即可
 - 在自定义函数中第一个参数`rule`即可接收到参数
-- ![image-20230628133127549](Vue.assets/image-20230628133127549.png)
+- ![image-20230628133127549](./assets/Vue/image-20230628133127549.png)
 
 
 
@@ -722,4 +722,20 @@ bypass(req, _res, options) {
 ```
 
 
+
+## Vue Router 跳转新标签页
+
+```js
+const toUserManger = (uid: number) => {
+  // 这里会返回路由信息而不是直接跳转
+  const routeData = router.resolve({
+    path: "/usermanage",
+    query: {
+      uid: uid,
+    },
+  });
+  // 使用
+  window.open(routeData.href, "_blank");
+};
+```
 

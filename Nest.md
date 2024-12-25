@@ -1,37 +1,587 @@
-## 13、metadata 和 Reflector
+## Nest相关概念
 
-- ```typescript
-  import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-  import { Observable } from 'rxjs';
-  import { Reflector } from '@nestjs/core';
+**controller**：控制器，用于处理路由，解析请求参数
+
+**handler**：控制器里处理路由的方法
+
+**service**：实现业务逻辑的地方，比如操作数据库等
+
+**dto**：data transfer object，数据传输对象，用于封装请求体里数据的对象
+
+**module**：模块，包含 controller、service 等，比如用户模块、书籍模块
+
+**entity**：对应数据库表的实体
+
+**ioc**：Inverse of Controller，反转控制或者叫依赖注入，只要声明依赖，运行时 Nest 会自动注入依赖的实例
+
+**aop**：Aspect Oriented Programming 面向切面编程，在多个请求响应流程中可以复用的逻辑，比如日志记录等，具体包含 middleware、interceotor、guard、exception filter、pipe
+
+**nest cli**：创建项目、创建模块、创建 controller、创建 service 等都可以用这个 cli 工具来做  
+
+
+
+## Nest Cli 使用
+
+- `nest new` 
+
+  - --skip-git：跳过git初始化
+  - --skip-install：跳过 npm install
+  - --package-manager：指定包管理器
+  - --language：指点 ts/js
+  - --strict：是否开启严格模式（默认false）
+
+- `nest generate`
+
+  - nest generate **module**：自动生成module代码，并在AppModule引入  
+  - nest generate controller：同上  
+  - nest generate service：同上  
+  - nest generate resource：生成完整的模块代码  
+  - --flat 和 --no-flat 是指定是否生成对应目录的  
+  - --spec 和 --no-spec 是指定是否生成测试文件 
+  -  --skip-import 是指定不在 AppModule 里引入  
+  - --project，这是指定生成代码在哪个子项目的，用于 monorepo 项目  
+
+- `nest build`  
+
+  - --wepback 和 --tsc 是指定用什么编译，默认是 tsc 编译，也可以切换成 webpack  
+
+    > tsc 不做打包、webpack 会做打包，两种方式都可以。
+    >
+    > node 模块本来就不需要打包，但是打包成单模块能提升加载的性能。
+
+  - --watch 是监听文件变动，自动 build 的  
+
+    > 但是 --watch 默认只是监听 ts、js 文件，加上 --watchAssets 会连别的文件一同监听变化，并输出到 dist 目录，比如 md、yml 等文件
+
+  - --path 是指定 tsc 配置文件的路径的  
+
+  - --config 是指定 nest cli 的配置文件
+
+- `nest-cli.json`
+
+  - 上面选项都可在此文件配置  
+
+- `nest start`  
+
+  - --watch：改动之后自动重新build
+  - --debug：启动调试的 websocket 服务，用来 debug  
+  - --exec： 可以指定用什么来跑，默认是用 node 跑，你也可以切换别的 runtime  
+
+- `nest info`  
+
+  - 查看项目信息的，包括系统信息、 node、npm 和依赖版本
+
+
+
+## 5种HTTP数据传输方式  
+
+- url param  
+
+  直接写在路径中：`http://guang.zxg/person/1111`
+
+- query  
+
+  - 通过 `url` 中 `?` 后面的 `&` 分隔字符传递数据：`http://guang.zxg/person?name=guang&age=20`   
+
+  - 非英文、特殊字符 要经过编码
+
+    ```js
+    const query = "?name=" + encodeURIComponent('光') + "&age=20"
+    // ?name=%E5%85%89&age=20
+    ```
+
+  - 或者使用 `query-string` 库处理
+
+    ```js
+    const queryString = require('query-string');
+    queryString.stringify({
+      name: '光',
+      age: 20
+    });
+    // ?name=%E5%85%89&age=20
+    ```
+
+- form-urlencoded  
+
+  - 直接用 form 表单提交数据就是这种，它和 query 字符串的方式的区别只是放在了 body 里，然后指定下 content-type 是 `application/x-www-form-urlencoded`  
+  - 因为内容也是 query 字符串，所以也要用 encodeURIComponent 的 api 或者 query-string 库处理下。
+
+- form-data  
+
+  - form data 使用 --------- + 一串数字做为 boundary 分隔符。因为不是 url 的方式了，自然也不用再做 url encode。
+
+  - content type 为 `multipart/form-data`   
+
+  - > 接收文件时，` @UploadedFiles() files: Array<Express.Multer.File>` 文件类型：pnpm i -D @types/multer
+
+- json  
+
+  - content type 为 `application/json`  
+
+
+
+## 使用多种 `provider` 注入对象  
+
+- `Model` 中注入方式
+
+  - 通过 `provide` 指定 token，使用 `useClass` 指定对象类，Nest 会自动对它做实例化后用来注入  
+
+    ```ts
+    @Module({
+      imports: [PersonModule],
+      controllers: [AppController],
+      providers: [ // 简写 AppService
+        {
+          provide: AppService, // 此处作为 token 使用，也可以使用字符串 "app_service" 
+          useClass: AppService,
+        },
+      ],
+    })
+    export class AppModule {}
+    ```
+
+  - 直接指定值，让 IoC 容器来注入
+
+    - 静态值使用 `useValue` 注入 
+
+      ```ts
+      {
+          provide: 'person',
+          useValue: {
+              name: 'aaa',
+              age: 20
+          }
+      }
+      // Controller 中注入使用 
+      @Inject('person') private readonly person:{name: string, age: number}
+      ```
+
+    - 动态值使用 `useFactory` 注入
+
+      ```ts
+      // useFactory 同样可以使用静态值
+      {
+          provide: 'person2',
+          useFactory() {
+              return {
+                  name: 'bbb',
+                  desc: 'cccc'
+              }
+          }
+      }
+      // Controller 中使用方式同上
+      ```
+
+      ```ts
+      // useFactory 通过参数注入别的 provider
+      {
+        provide: 'person3',
+        useFactory(person: { name: string }, appService: AppService) {
+          return {
+            name: person.name,
+            desc: appService.getHello()
+          }
+        },
+        inject: ['person', AppService]
+      }
+      // 通过 inject 声明了两个 token，一个是字符串 token 的 person，一个是 class token 的 AppService。
+      ```
+
+      ```ts
+      // useFactory 支持异步 此处阻塞的是应用启动注入的过程
+      {
+        provide: 'person5',
+        async useFactory() {
+          await new Promise((resolve) => {
+            setTimeout(resolve, 3000);
+          });
+          return {
+            name: 'bbb',
+            desc: 'cccc'
+          }
+        },
+      },
+      ```
+
+    - 可以通过 useExisting 指定别名
+    
+      ```ts
+      {
+        provide: 'person4',
+        useExisting: 'person2'
+      }
+      ```
+    
+      
+
+- `Controller` 中两种注入方式
+
+  - 构造器注入
+
+  - 属性注入
+
+    ```ts
+    @Controller()
+    export class AppController {
+    	// 构造器注入
+      constructor(private readonly appService: AppService) {}
+        
+      // @Inject('app_service') private readonly appService: AppService // 如果上面使用 string 作为 token，则此处使用     @Inject 手动指定 token
+    
+      // 属性注入
+      // @Inject(AppService)
+      // private readonly appService: AppService;
+    
+      @Get()
+      getHello(): string {
+        return this.appService.getHello();
+      }
+    }
+    ```
+
   
-  @Injectable()
-  export class AaaGuard implements CanActivate {
-    constructor(private reflactor: Reflector) {}
+
+## 全局模块和生命周期  
+
+- 应用加载的时候
+
+  首先，递归初始化模块，依次调用模块内的 `controller`、`provider` 的 `onModuleInit` 方法，然后再调用 `module` 的 `onModuleInit` 方法。
+  全部初始化完之后，再依次调用模块内的 `controller`、`provider` 的 `onApplicationBootstrap` 方法，然后调用 `module` 的 `onApplicationBootstrap` 方法
+
+- 应用销毁的时候
+
+  1. 调用每个模块的 controller、provider 的 `onModuleDestroy` 方法
+  2. 调用 Module 的 `onModuleDestroy` 方法
+  3. 调用每个模块的 controller、provider 的 `beforeApplicationShutdown` 方法
+  4. 调用 Module 的 `beforeApplicationShutdown` 方法
+  5. 停止监听网络端口
+  6. 调用每个模块的 controller、provider 的 `onApplicationShutdown` 方法
+  7. 调用 Module 的 onApplicationShutdown 方法
+  8. 停止进程
+
+- 通过 moduleRef 取出一些 provider，执行关闭连接等销毁逻辑
+
+  用法见小册
+
+
+
+## AOP （面向切面编程）
+
+> **AOP 的好处是可以把一些通用逻辑分离到切面中，保持业务逻辑的纯粹性，这样切面逻辑可以复用，还可以动态的增删。**
+>
+> Express 的中间件的洋葱模型就是一种 AOP 的实现
+
+Nest 实现 AOP 的方式：`Middleware`、`Guard`、`Pipe`、`Interceptor`、`ExceptionFilter`  
+
+- Middleware
+
+  - 全局中间件
+  - 路由中间件
+
+- Guard
+
+  Guard 是路由守卫的意思，可以用于在调用某个 Controller 之前判断权限，返回 true 或者 false 来决定是否放行：
+
+  ![img](./assets/Nest/9e9a9eee8aa74881b6789dd753916202tplv-k3u1fbpfcp-jj-mark3326000q75.webp)
+
+- Interceptor
+
+  Interceptor 是拦截器的意思，可以在目标 Controller 方法前后加入一些逻辑：
+
+  ![img](./assets/Nest/3a981ca0f64c4e37be0475d95366a0eftplv-k3u1fbpfcp-jj-mark3326000q75.webp)
+
+- Pipe
+
+  `nest g pipe validate --no-spec --flat`
+
+  对参数做一些校验和转换
+
+  一些内置 Pipe
+
+  - ValidationPipe
+  - ParseIntPipe
+  - ParseBoolPipe
+  - ParseArrayPipe
+  - ParseUUIDPipe
+  - DefaultValuePipe
+  - ParseEnumPipe
+  - ParseFloatPipe
+  - ParseFilePipe
+
+- ExceptionFilter  
+
+  `nest g filter test --no-spec --flat`
+
+  对抛出的异常做处理，返回对应的响应
+
+  内置的相关异常，都是 HttpException 的子类
+
+  - BadRequestException
+  - UnauthorizedException
+  - NotFoundException
+  - ForbiddenException
+  - NotAcceptableException
+  - RequestTimeoutException
+  - ConflictException
+  - GoneException
+  - PayloadTooLargeException
+  - UnsupportedMediaTypeException
+  - UnprocessableException
+  - InternalServerErrorException
+  - NotImplementedException
+  - BadGatewayException
+  - ServiceUnavailableException
+  - GatewayTimeoutException
+
+
+
+
+
+## 几种 AOP 机制的顺序
+
+![img](./assets/Nest/a4d0291cafa9449ca4702617464c5979tplv-k3u1fbpfcp-jj-mark3326000q75.webp)
+
+
+
+## Nest 装饰器
+
+- @Module：声明模块
+- @Controller：声明 controller  
+- @Injectable：声明 provider，这里provider可以是任意 class，注入方式见上。用`@Optional()`声明可选
+- @Catch/@UseFilters：filter 处理抛出的未捕获异常，通过 @Catch 来指定处理的异常，然后通过 @UseFilters  用到 handler 上
+
+​	<img src="./assets/Nest/image-20241009140504788.png" alt="image-20241009140504788" style="zoom: 80%;" />
+
+​	**四种注入方式：（interceptor、guard、pipe使用方式与之相同）**
+
+​	<img src="./assets/Nest/image-20241009140837385.png" alt="image-20241009140837385" style="zoom:80%;" />
+
+​	Pipe 单独在参数位置应用	
+
+- ![img](./assets/Nest/5fced92c2344495b86524871d8ed9cfatplv-k3u1fbpfcp-jj-mark3326000q75.webp)
+
+- 请求：@Get、@Post 、@Put、@Delete、@Patch、@Options、@Head
+
+- @SetMetadata：指定 handler 和 class 的 metadata  
+
+  <img src="./assets/Nest/937ac8e44f2d4fedb9818a0b6c8e70c5tplv-k3u1fbpfcp-jj-mark3326000q75.webp" alt="img" />  
+
+  然后在 guard 或者 interceptor 里取出来  
+
+  <img src="./assets/Nest/27163078cd944d68b10c13068dc08145tplv-k3u1fbpfcp-jj-mark3326000q75.webp" alt="img" style="zoom:80%;" />  
+
+- @Headers：取**某个请求头**或者**全部请求头**  
+
+  ![image-20241009143628148](./assets/Nest/image-20241009143628148.png)  
+
+- @Ip：拿到请求的 IP  
+
+- @Session：拿到 session 对象（需要安装一个 express 中间件： `pnpm i express-session`）
+
+  具体使用方式见小册：[session 使用](https://juejin.cn/book/7226988578700525605/section/7234726536342372412?enter_from=course_center&utm_source=course_center)
+
+- @HostParam：用于取域名部分的参数  
+
+- @Req / @Request：request 对象  
+
+- @Res / @Response：response 对象  
+
+  注入 response 对象之后Nest就不会把 handler 返回值作为响应内容了，需要手动使用 `res.end()`返回响应
+
+  或者通过 `passthrough` 参数告诉 Nest 返回响应  
+
+  ![img](./assets/Nest/404c6fe6d28947de89e1b94d3b535e5ctplv-k3u1fbpfcp-jj-mark3326000q75.webp)  
+
+- @Next：注入 next 也不会返回相应
+
+  当你有两个 handler 来处理同一个路由的时候，可以在第一个 handler 里注入 next，调用它来把请求转发到第二个 handler，Nest 不会处理注入 @Next 的 handler 的返回值。  
+
+  ![image-20241009170746995](./assets/Nest/image-20241009170746995.png)  
+
+
+- @HttpCode：修改响应状态码  
+
+  ![image-20241009171304861](./assets/Nest/image-20241009171304861.png)  
+
+- @Header：修改 response header  
+
+  ![image-20241009171555244](./assets/Nest/image-20241009171555244.png)  
+
+-  @Redirect：指定路由重定向的url  
+
+  ![image-20241009171824680](./assets/Nest/image-20241009171824680.png)  
+
+  另一种设置方式  
+
+  ![image-20241009172117576](./assets/Nest/image-20241009172117576.png)  
+
+- @Render：给返回的响应内容指定渲染引擎  
+
+  1. 安装模板引擎包 hbs：
   
-    canActivate(
-      context: ExecutionContext,
-    ): boolean | Promise<boolean> | Observable<boolean> {
-      console.log('guard');
-      console.log(this.reflactor.get('roles', context.getHandler())); // 这里拿到的是方法上注入的 metadata
-      console.log(this.reflactor.get('roles', context.getClass())); // 这里拿到的是 class 上注入的 metadata
+     `npm install --save hbs`
   
-      return true;
+  2. 指定静态资源的路径和模板的路径，并指定模版引擎为 handlerbars
+  
+     ```js
+     // main.ts
+       app.useStaticAssets(join(__dirname, '..', 'public'));
+       app.setBaseViewsDir(join(__dirname, '..', 'views'));
+       app.setViewEngine('hbs');
+     ```
+  
+  3. 准备图片和模板文件  
+  
+     ![image-20241009174308811](./assets/Nest/image-20241009174308811.png)  
+  
+  4. 在 handler 里指定模版和数据  
+  
+     ![image-20241009174715018](./assets/Nest/image-20241009174715018.png)  
+  
+
+
+
+
+
+## 自定义装饰器
+
+#### 自定义方法装饰器
+
+- 创建个 decorator：`nest g decorator aaa --flat`
+
+- 使用  
+
+  ![image-20241009182116238](./assets/Nest/image-20241009182116238.png)  
+
+- 合并使用装饰器  
+
+  ![image-20241010133853962](./assets/Nest/image-20241010133853962.png)  
+
+#### 自定义参数装饰器
+
+- ```js
+  import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+  
+  export const Ccc = createParamDecorator(
+    (data: string, ctx: ExecutionContext) => {
+      return 'ccc';
+    },
+  );
+  ```
+
+  其中 `data` 是传入的参数，`ExecutionContext` 可以取出 request、response 对象
+
+#### 自定义 Class 装饰器
+
+- 与自定义方法装饰器相同
+
+  ![image-20241010143101768](./assets/Nest/image-20241010143101768.png)  
+
+  
+
+## metadata 和 Reflector
+
+#### Nest 实现原理
+
+**通过装饰器给 class 或者对象添加 metadata，并且开启 ts 的 emitDecoratorMetadata 来自动添加类型相关的 metadata，然后运行的时候通过这些元数据来实现依赖的扫描，对象的创建等等功能。**
+
+Reflect.defineMetadata 和 Reflect.getMetadata 分别用于设置和获取某个类的元数据，如果最后传入了属性名，还可以单独为某个属性设置元数据。
+
+#### @SetMetadata 使用
+
+- guard 中使用
+
+  ![image-20241012134307580](./assets/Nest/image-20241012134307580.png)  
+
+  此处使用 构造函数 注入使用  
+
+- interceptor 中使用
+
+  ![image-20241012134403532](./assets/Nest/image-20241012134403532.png)  
+
+  此处使用 装饰器 注入使用
+
+  `@SetMetadata` 可以在 handler 和 class 中使用，取值时方式不同
+
+- `reflector` 的其他方法
+
+  ![image-20241012135711051](./assets/Nest/image-20241012135711051.png)  
+
+  ![image-20241012141011722](./assets/Nest/image-20241012141011722.png)  
+
+  - **get**：get 的实现就是 Reflect.getMetadata
+
+  - **getAll**：返回一个 metadata 的数组  
+
+  - **getAllAndMerge**：会把它们合并为一个对象或者数组
+
+  - **getAllAndOverride**：返回第一个非空的 metadata
+
+    
+
+## ExecutionContext：切换不同上下文
+
+>**ArgumentHost 是用于切换 http、websocket、rpc 等上下文类型的，可以根据上下文类型取到对应的 argument，让 Exception Filter 等在不同的上下文中复用**。
+
+- **filter** 中使用
+
+  ```ts
+  import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
+  import { Response } from 'express';
+  import { AaaException } from 'src/aaa/AaaException';
+  
+  @Catch(AaaException)
+  export class AaaFilter implements ExceptionFilter {
+    catch(exception: AaaException, host: ArgumentsHost) {
+      if(host.getType() === 'http') {
+        const ctx = host.switchToHttp();
+        const response = ctx.getResponse<Response>();
+        const request = ctx.getRequest<Request>();
+  
+        response
+          .status(500)
+          .json({
+            aaa: exception.aaa,
+            bbb: exception.bbb
+          });
+      } else if(host.getType() === 'ws') {
+  
+      } else if(host.getType() === 'rpc') {
+  
+      }
     }
   }
   ```
 
-  这里`this.reflactor.get`相当于`Reflactor.getMetadata(metadataKey, target, propertyKey)`，第一个参数传入注入的key值，第二个参数取决于注入的位置，**方法**还是**class**
+- **guard** 中使用
+
+  ExecutionContext 是 ArgumentHost 的子类，扩展了 getClass、getHandler 方法
+
+  ![image-20241014151726887](./assets/Nest/image-20241014151726887.png)  
+
+  ![img](./assets/Nest/70d4b54f55ec4bc188324284367baa79tplv-k3u1fbpfcp-jj-mark3326000q75.webp)  
+
+- **interceptor** 中同上
 
 
 
-## 14、Module 和 Provide 循环依赖
-
-使用 `forwordRef` 注入解决循环依赖报错的问题
 
 
+## 处理 Module 和 Provider 的循环依赖
 
-## 15、创建动态模块
+- 使用 `forwardRef`：Nest 会单独创建两个 Module，之后再把 Module 的引用转发过去
+
+  ![image-20241014153427039](./assets/Nest/image-20241014153427039.png)  
+
+- Service 相互引用产生循环依赖同样使用 `forwardRef` 解决
+
+  ![img](./assets/Nest/f1bc24f5721e483bbcd293551be7084btplv-k3u1fbpfcp-jj-mark3326000q75.webp)  
+
+
+
+
+
+## 创建动态模块 Dynamic Module
 
 - 创建模块的时候定义一个静态方法，通过传入options和返回值进行动态创建模块，使用的时候调用模块的这个静态方法即可
 
@@ -40,6 +590,7 @@
   export class BbbModule {
     static register(options: Record<string, any>): DynamicModule {
       return {
+        // 这里和在装饰器里定义有所区别，多了一个 module 属性
         module: BbbModule,
         controllers: [BbbController],
         providers: [
@@ -55,100 +606,67 @@
   }
   ```
 
-- 这个静态方法名字可以自定义，但是约定了3种方法名
+  使用的时候调用上面定义的静态方法
 
-  - **register**：用一次模块传一次配置，比如这次调用是 BbbModule.register({aaa:1})，下一次就是 BbbModule.register({aaa:2}) 了
-  - **forRoot**：配置一次模块用多次，比如 XxxModule.forRoot({}) 一次，之后就一直用这个 Module，一般在 AppModule 里 import
-  - **forFeature**：用了 forRoot 固定了整体模块，用于局部的时候，可能需要再传一些配置，比如用 forRoot 指定了数据库链接信息，再用 forFeature 指定某个模块访问哪个数据库和表。
+  ![image-20241014172539793](./assets/Nest/image-20241014172539793.png)  
 
-- **方法二**
+- 这个静态方法名字可以自定义，但是约定了3种方法名  
 
-  - ```typescript
-    // ccc.module-definition.ts
-    import { ConfigurableModuleBuilder } from '@nestjs/common';
-    
-    export interface CccModuleOptions {
+  - **register**：用一次模块传一次配置，比如这次调用是 BbbModule.register({aaa:1})，下一次就是 BbbModule.register({aaa:2}) 了  
+  - **forRoot**：配置一次模块用多次，比如 XxxModule.forRoot({}) 一次，之后就一直用这个 Module，一般在 AppModule 里 import  
+  - **forFeature**：用了 forRoot 固定了整体模块，用于局部的时候，可能需要再传一些配置，比如用 forRoot 指定了数据库链接信息，再用 forFeature 指定某个模块访问哪个数据库和表。  
+
+- **方法二创建动态模块**  
+
+  1. 使用 `ConfigurableModuleBuilder` 创建Module，抛出 `ConfigurableModuleClass`，`MODULE_OPTIONS_TOKEN`
+  
+     ![image-20241016143006036](./assets/Nest/image-20241016143006036.png)  
+  
+  2. 使用
+  
+     ![image-20241016143058266](./assets/Nest/image-20241016143058266.png)  
+  
+  3. 使用抛出的 token 注入 controller，及使用 options
+  
+     options 对象一般不这么用，而是用来做配置
+  
+     ![image-20241016143140565](./assets/Nest/image-20241016143140565.png)  
+  
+  4. 注册的时候传入参数
+  
+     ![image-20241016143246747](./assets/Nest/image-20241016143246747.png)  
+  
+  - 还可以用 useFactory 动态创建 options 对象
+  
+    ![image-20241016171111199](./assets/Nest/image-20241016171111199.png)  
+  
+- forRoot、forFeature 使用此方法创建
+
+  ![img](./assets/Nest/f63a5c0c2f2c40cb9a0719f8afe559dctplv-k3u1fbpfcp-jj-mark3326000q75.webp)  
+
+- 是否设置为全局模块
+
+  ```ts
+  import { ConfigurableModuleBuilder } from "@nestjs/common";
+  
+  export interface CccModuleOptions {
       aaa: number;
       bbb: string;
-    }
-    
-    export const {
-      ConfigurableModuleClass,
-      MODULE_OPTIONS_TOKEN,
-      OPTIONS_TYPE, // 此处的 OPTIONS_TYPE 就是 CccModuleOptions 和一些拓展属性类型
-      ASYNC_OPTIONS_TYPE,
-    } = new ConfigurableModuleBuilder<CccModuleOptions>()
-      .setClassMethodName('forRoot') // 设置静态方法名 对应3种情况：forRoot、forRootAsync、register
-      .setExtras({ isGlobal: true }, (definition, extras) => ({
-        // 参数一给 options 拓展的属性，参数二回调函数是收到 extras 属性之后如何修改模块定义
-        ...definition,
-        global: extras.isGlobal,
-      }))
-      .build();
-    
-    ```
+  }
+  
+  export const { ConfigurableModuleClass, MODULE_OPTIONS_TOKEN } =
+    new ConfigurableModuleBuilder<CccModuleOptions>().setClassMethodName('register').setExtras({
+      isGlobal: true
+    }, (definition, extras) => ({
+      ...definition,
+      global: extras.isGlobal,
+    })).build();
+  ```
 
-  - ```typescript
-    // ccc.controller.ts
-    import { Controller, Get, Inject } from '@nestjs/common';
-    import {
-      OPTIONS_TYPE,
-      ASYNC_OPTIONS_TYPE,
-      MODULE_OPTIONS_TOKEN,
-    } from './ccc.module-definition';
-    
-    @Controller('ccc')
-    export class CccController {
-      // 使用构造函数进行注入
-      constructor(
-        @Inject(MODULE_OPTIONS_TOKEN) private readonly options: typeof OPTIONS_TYPE, // 此处通过 typeof 获取到 OPTIONS_TYPE 类型
-      ) {}
-      // 直接进行注入，不需要再进行构造函数的参数注入
-      // @Inject(MODULE_OPTIONS_TOKEN) private readonly options: CccModuleOptions;
-    
-      @Get('')
-      hrllo() {
-        console.log(this.options.isGlobal); // 这里打印 undefined，因为 isGlobal 是额外的参数，用来处理模块定义的，options 里拿不到
-        return this.options;
-      }
-    }
-    
-    ```
-
-  - ```typescript
-    // app.module.ts
-    import { Module } from '@nestjs/common';
-    import { AppController } from './app.controller';
-    import { AppService } from './app.service';
-    import { BbbModule } from './bbb/bbb.module';
-    import { CccModule } from './ccc/ccc.module';
-    
-    @Module({
-      imports: [
-        BbbModule.register({ name: 'bbb', age: 20 }),
-        // 使用 register
-        // CccModule.register({ aaa: 10, bbb: 'bbb' }),
-        // 使用 registerAsync 
-        // CccModule.registerAsync({
-        //   useFactory: async () => {
-        //     await new Promise((resolve) => setTimeout(resolve, 1000));
-        //     return { aaa: 10, bbb: 'ccc' };
-        //   },
-        // }),
-        // 使用 forRoot 和 拓展属性
-        CccModule.forRoot({ aaa: 13, bbb: 'ccc', isGlobal: true }),
-      ],
-      controllers: [AppController],
-      providers: [AppService],
-    })
-    export class AppModule {}
-    
-    ```
+  - setExtras 第一个参数是给 options 扩展啥 extras 属性，第二个参数是收到 extras 属性之后如何修改模块定义。
 
 
-
-
-## 16、切换 fastify
+## 切换 fastify
 
 - ```typescript
   // 先安装 pnpm install fastify @nestjs/platform-fastify
@@ -197,7 +715,7 @@
 
   
 
-## 17、middleWare
+## Nest 中的 middleWare
 
 > 类似 Express 中的 中间件
 
@@ -269,48 +787,72 @@
        console.log('After');
      }
    }
-   
    ```
+
+   > 可以使用 class 的形式（方便使用 Inject），也可以使用 function（和 Express 中的 middleware 相似）
 
 5. **next()** 参数和 **@Next** 装饰器区别
 
    - next参数是调用下一个middleware的,类似于vue路由守卫中的next
 
-   - @Next 是调用下一个 handler 的, 和 @Response的效果一样
-
-     ![image-20230713133026009](Nest.assets/image-20230713133026009.png)
+   - @Next 是调用下一个 handler 的, 和 @Response的效果一样![image-20230713133026009](./assets/Nest/image-20230713133026009.png)
 
 6. 和 interceptor 的区别
 
    - interceptor 是能从 ExecutionContext 里拿到目标 class 和 handler，进而通过 reflector 拿到它的 metadata 等信息的，这些 middleware 就不可以
    - interceptor 里是可以用 rxjs 的操作符来组织响应处理流程的
+   - interceptor 更适合处理与**具体业务相关的逻辑**，而 middleware 适合更**通用的处理逻辑**
 
 
 
-## 18、RxJS 和 Interceptor 
+## RxJS 和 Interceptor 
 
 ### RxJS
 
 - tap: 不修改响应数据，执行一些额外逻辑，比如记录日志、更新缓存等
+
+  ![image-20241018152137800](./assets/Nest/image-20241018152137800.png)  
+
 - map：对响应数据做修改，一般都是改成 {code, data, message} 的格式
+
+  ![image-20241018152205826](./assets/Nest/image-20241018152205826.png)  
+
 - catchError：在 exception filter 之前处理抛出的异常，可以记录或者抛出别的异常
+
+  ![image-20241018153039338](./assets/Nest/image-20241018153039338.png)  
+
 - timeout：处理响应超时的情况，抛出一个 TimeoutError，配合 catchErrror 可以返回超时的响应
 
 ### Interceptor
 
-- 全局注入：main.ts 中 `app.useGlobalInterceptors(new xxxInterceptor())`
+- 全局注入：main.ts 中 `app.useGlobalInterceptors(new xxxInterceptor())`  
 
-  这种手动 new 的没法注入依赖
+  这种手动 new 的没法注入依赖  
 
-- 使用 Nest 提供的 token 实现全局注入
+- 路由级别注入：可以注入依赖  
 
-  ![img](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5e126e39cc9e435aac798e07947c4cfb~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp?)
+- 使用 Nest 提供的 token 实现全局注入（解决手动 new 全局注入没法注入依赖的问题）  
+
+  ![img](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5e126e39cc9e435aac798e07947c4cfb~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp?)  
 
 
 
-## 19、内置 Pipe 和 自定义 Pipe
+## 内置 Pipe 和 自定义 Pipe
+
+> Pipe 是在参数传给 handler 之前对参数做一些验证和转换的 class
 
 ### 内置Pipe
+
+- 内置 Pipe 有：
+  - ValidationPipe
+  - ParseIntPipe：整型
+  - ParseBoolPipe：Boolean
+  - ParseArrayPipe：转换为数组    
+  - ParseUUIDPipe：是随机生成的几乎不可能重复的字符串，一般用过做ID
+  - DefaultValuePipe：设置参数默认值
+  - ParseEnumPipe  
+  - ParseFloatPipe
+  - ParseFilePip
 
 - 直接使用如： `@Query('aa', ParseIntPipe)`
 
@@ -339,6 +881,8 @@
   ```
 
 - **ParseArrayPipe**
+
+  ![image-20241021160029353](./assets/Nest/image-20241021160029353.png)
 
   ```typescript
     @Get('cc')
@@ -396,17 +940,17 @@
 
   - **value**：handler里面接收到的值
 
-  - **metadata**：元数据对象，包含有关传递给管道的值的其他信息，例如它的类型和所在的位置![image-20230714103916060](Nest.assets/image-20230714103916060.png)
+  - **metadata**：元数据对象，包含有关传递给管道的值的其他信息，例如它的类型和所在的位置![image-20230714103916060](./assets/Nest/image-20230714103916060.png)
     - metatype：参数的ts类型
     
     - type：装饰器
     
     - data：传给装饰器的参数
-      ![image-20230714104444593](Nest.assets/image-20230714104444593.png)
+      ![image-20230714104444593](./assets/Nest/image-20230714104444593.png)
 
 
 
-## 20、ValidationPipe
+## ValidationPipe 验证 post 请求
 
 1. 安装依赖包 `npm install -D class-validator class-transformer`
 2. @Body(new ValidationPipe()) 
@@ -446,7 +990,7 @@
   - value：接收到的值
   - metadata：与get请求时的pipe类似
   - 注意 metadata.metatype 即 dto 里定义的 class， 通过 plainToInstance 将 value 转换为此类的实例对象，再通过 validate 进行验证
-  ![](Nest.assets\image-20230714134847858.png)
+  ![image-20230714104444593](./assets/Nest/image-20230714134847858.png)
 
 - 此外 pipe 中也可以进行依赖注入，方法同常规一样，但是需要去掉手动new`@Body(ValidationPipe）` 
 - 若要创建全局 pipe，可以使用 nest 提供的 token ： **APP_PIPE**，方法同 Interceptor
@@ -473,13 +1017,23 @@
 
 
 
-## 21、串一串Nest核心概念
+
+
+## 自定义 Exception Filter 
+
+> 
+
+
+
+
+
+## 串一串Nest核心概念
 
 <img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/24060e0f32204907887ede38c1aa018c~tplv-k3u1fbpfcp-zoom-in-crop-mark:3024:0:0:0.awebp?" alt="img" />
 
 
 
-## 22、Express 文件上传
+## Express 文件上传
 
 > 通过 multer 包实现文件上传
 
@@ -561,7 +1115,7 @@
 
 
 
-## 23、Nest 文件上传 
+## Nest 文件上传 
 
 1. 安装 multer 类型包 `npm install -D @types/multer`
 
@@ -718,7 +1272,7 @@
      }
    ```
 
-6. 自定义 FileValidator
+6. 自定义 FileValidator：继承 `FileValidator`
 
    ```ts
    import { FileValidator } from "@nestjs/common";
@@ -741,17 +1295,265 @@
 
 
 
-## 24、Nest 打印日志
-
-> 暂时只做了解
+## 大文件分片上传（待学习）
 
 
 
-## 25、Docker
+
+
+## OSS上传方案
+
+> [掘金小册](https://juejin.cn/book/7226988578700525605/section/7324620995183968293?enter_from=course_center&utm_source=course_center)
+
+
+
+
+
+## Nest 打印日志
+
+- 使用Nest API 进行日志打印
+
+  ```ts
+  import { ConsoleLogger, Controller, Get, Logger } from '@nestjs/common';
+  import { AppService } from './app.service';
+  
+  @Controller()
+  export class AppController {
+    private logger = new Logger(); // 初始化 Logger
+  
+    constructor(private readonly appService: AppService) {}
+  
+    @Get()
+    getHello(): string {
+      this.logger.debug('aaa', AppController.name);
+      this.logger.error('bbb', AppController.name);
+      this.logger.log('ccc', AppController.name);
+      this.logger.verbose('ddd', AppController.name);
+      this.logger.warn('eee', AppController.name);
+      
+      return this.appService.getHello();
+    }
+  }
+  ```
+
+  ![img](./assets/Nest/7ead7a4c67254e3aa20ffe4bd84f1266tplv-k3u1fbpfcp-jj-mark3326000q75.webp)  
+
+- 控制 Nest 打印日志**是否开启**或者打印**日志级别**
+
+  ![img](./assets/Nest/aaea63a9c9e04a52854e6a58a5b0bd92tplv-k3u1fbpfcp-jj-mark3326000q75.webp)  
+
+- 自定义日志打印方式
+
+  - 只用实现log、warn、error 3 个方法（定义实现 LoggerService 接口的类）
+
+    ```ts
+    import { LoggerService, LogLevel } from '@nestjs/common';
+    
+    export class MyLogger implements LoggerService {
+        log(message: string, context: string) {
+            console.log(`---log---[${context}]---`, message)
+        }
+    
+        error(message: string, context: string) {
+            console.log(`---error---[${context}]---`, message)
+        }
+    
+        warn(message: string, context: string) {
+            console.log(`---warn---[${context}]---`, message)
+        }
+    }
+    ```
+
+  - 在创建应用时指定这个 logger
+
+    ![img](./assets/Nest/ac42f8d90a4f4192b95823d5e5d9c18ftplv-k3u1fbpfcp-jj-mark3326000q75.webp)  
+  
+- 重写部分Logger 方法
+
+  ```ts
+  import { ConsoleLogger } from '@nestjs/common';
+  
+  // 这里 ConsoleLogger 也是实现了LoggerService接口的类
+  export class MyLogger2 extends ConsoleLogger{
+      log(message: string, context: string) {
+          console.log(`[${context}]`,message)
+      }
+  }
+  ```
+
+  未重写的方法还会使用原来的
+
+- 如果想在 Logger 注入一些 provider，就需要创建应用时设置 bufferLogs 为 true，然后用 app.useLogger(app.get(xxxLogger)) 来指定 Logger。
+- 可以把这个自定义 Logger 封装到全局模块，或者动态模块里
+
+
+
+## Node日志框架：winston
+
+#### winston 使用
+
+[使用文档](https://github.com/winstonjs/winston/blob/HEAD/docs/transports.md#winston-core)
+
+```ts
+import winston from 'winston';
+import 'winston-daily-rotate-file'; // 通过安装此社区库，可以将日志按日期存储
+
+const logger = winston.createLogger({
+    level: 'debug', // 日志级别有六种，当前级别以上日志都会输出
+    format: winston.format.simple(), // 指定日志格式，simple/json/prettyPrint（比 json 的格式多了一些空格）
+    transports: [
+        // 这里会在控制台打印日志
+        new winston.transports.Console(),
+        // 这里会保存日志文件, 通过maxSize 控制每个日志文件大小，还能控制日志文件数量
+        new winston.transports.File({ 
+            dirname: 'log', filename: 'test.log', maxSize: 1024 
+        }),
+        // 按照日期存储日志文件
+        new winston.transports.DailyRotateFile({
+            level: 'info',
+            dirname: 'log2',
+            filename: 'test-%DATE%.log',
+            datePattern: 'YYYY-MM-DD-HH-mm',
+            maxSize: '1k'
+        })
+        
+        // 将日志发送到别的服务器（POST）
+        new winston.transports.Http({
+			host: 'localhost',
+			port: '3000',
+			path: '/winston-log-server/log'
+		})
+    ]
+});
+
+logger.info('光光光光光光光光光');
+logger.error('东东东东东东东东');
+logger.debug(66666666);
+```
+
+#### Nest 使用 winston
+
+1. src 创建文件 MyLogger.ts，安装 `npm install --save  winston`
+
+2. main.ts 引入文件
+
+   ```js
+   app.useLogger(new MyLogger());
+   ```
+
+3. 使用
+
+   ![img](./assets/Nest/7f85411fb623487294b99ea259f8f329tplv-k3u1fbpfcp-jj-mark3326000q75.webp)  
+
+```js
+import { LoggerService } from '@nestjs/common';
+import * as chalk from 'chalk';
+import * as dayjs from 'dayjs';
+import { Logger, createLogger, format, transports } from 'winston';
+
+export class MyLogger implements LoggerService {
+  private logger: Logger;
+
+  constructor() {
+    this.logger = createLogger({
+      level: 'debug',
+      transports: [
+        new transports.Console({
+          format: format.combine(
+            format.colorize(),
+            format.printf(({ context, level, message, time }) => {
+              const apppStr = chalk.green(`[NEST]`);
+              const contextStr = chalk.yellow(`[${context}]`);
+
+              return `${apppStr} ${time} ${level} ${contextStr} ${message}`;
+            }),
+          ),
+        }),
+        new transports.File({
+          format: format.combine(format.timestamp(), format.json()),
+          filename: 'logs/error.log',
+          dirname: 'logs',
+        }),
+      ],
+    });
+  }
+
+  log(message: string, context: string) {
+    const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    this.logger.log('info', message, { context, time });
+  }
+
+  error(message: string, context: string) {
+    const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    this.logger.log('error', message, { context, time });
+  }
+
+  warn(message: string, context: string) {
+    const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    this.logger.log('warn', message, { context, time });
+  }
+}
+```
+
+#### 封装动态模块
+
+1. `nest g module winston`
+
+2. ```js
+   import { DynamicModule, Global, Module } from '@nestjs/common';
+   import { LoggerOptions, createLogger } from 'winston';
+   import { MyLogger } from './MyLogger';
+   
+   export const WINSTON_LOGGER_TOKEN = 'WINSTON_LOGGER';
+   
+   @Global()
+   @Module({})
+   export class WinstonModule {
+   	// 创建动态模块，将 options 传入
+       public static forRoot(options: LoggerOptions): DynamicModule {    
+           return {
+               module: WinstonModule,
+               providers: [
+                   {
+                       provide: WINSTON_LOGGER_TOKEN,
+                       useValue: new MyLogger(options)
+                   }
+               ],
+               exports: [
+                   WINSTON_LOGGER_TOKEN
+               ]
+           };
+         }
+   }
+   ```
+
+3. 将 MyLogger.ts 改为 options 传入方式
+
+   ![img](./assets/Nest/064e62df7d7549fab47b1074d919548etplv-k3u1fbpfcp-jj-mark3326000q75.webp)
+
+4. 在 AppModule 中引入下，引入的时候将 options 传入
+
+   ![img](./assets/Nest/ad440d150d934da7aa711b62dce8e17dtplv-k3u1fbpfcp-jj-mark3326000q75.webp)  
+
+5. 在 main.ts 中使用
+
+   ![img](./assets/Nest/42d162c402d144e3b2f7d5f9268ef399tplv-k3u1fbpfcp-jj-mark3326000q75.webp)  
+
+6. 使用改用 Inject 的方式，始终使用同一个实例，性能更好
+
+   ```js
+   @Inject(WINSTON_LOGGER_TOKEN)
+   private logger;
+   ```
+
+> 或者使用封装好的模块：[nest-winston](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fnest-winston)
+
+
+## Docker
 
 - `docker pull`：拉取镜像
 - `docker run --name nginx-test2 -p 80:80 -v /tmp/aaa:/usr/share/nginx/html -e KEY1=VALUE1 -d nginx:latest `
-  - -p 是端口映射
+  - -p 是端口映射（-p 可以衔接多个 -p 80:80 -p 6666:6666 在nginx中，配置对应6666的端口监听，那么一个nginx容器，就可以监听多个端口了）
   - -v 是指定数据卷挂载目录
   - -e 是指定环境变量
   - -d 是后台运行
@@ -760,15 +1562,24 @@
   - -i 是 terminal 交互的方式运行
   - -t 是 tty 终端类型
   - 例如：`docker exec -i -t 68630e312c6ebf8b4ded7e9a583d6c5a4e75a1c95948415397a136b329ae5fb5 /bin/bash`
-- `docker inspect`：查看容器详情
+- `docker inspect <id>`：查看容器详情
 - `docker volume`：管理卷数据
+  - `create`      Create a volume
+  - `inspect`     Display detailed information on one or more volumes
+  - `ls`          List volumes
+  - `prune`       Remove unused local volumes
+  - `rm`          Remove one or more volumes
+  - `update`      Update a volume (cluster volumes only)
+
 - `docker start`：启动一个已经停止的容器
 - `docker rm`：删除一个容器
 - `docker stop`：停止一个容器
+- `docker ps`：显示运行中的容器列表（`-a` 全部容器列表）
+- `docker images`：镜像列表
 
 
 
-## 26、DockerFile
+## DockerFile
 
 - ```typescript
   FROM node:latest
@@ -952,7 +1763,7 @@
 
 - Nest 中使用
 
-  ![image-20230718155653797](Nest.assets/image-20230718155653797.png)
+  ![image-20230718155653797](./assets/Nest/image-20230718155653797.png)
   - 注意：通过pm2 start在docker内启动进程会死掉，导致起不来,pm2 是默认后台启动的， docker 感知不到,CMD命令执行完成，docker 容器就结束了。**pm2-runtime** 是专门为容器设计的，保证在后台一直运行
 
 
@@ -1037,7 +1848,7 @@
 
   - 内置的函数 `AVG()` 求平均值
 
-  - ![image-20230719140408593](Nest.assets/image-20230719140408593.png)
+  - ![image-20230719140408593](./assets/Nest/image-20230719140408593.png)
 
   - 这里注意 ORDER BY 后面的值相当于变量，不能添加引号
 
@@ -1460,7 +2271,7 @@ from 后的是左表，join 后的是右表。
 
 - 关联：使用 `@JoinColum` 定义外键列， `@OneToTone`创建对应关系
 
-  ![image-20230724142703168](Nest.assets/image-20230724142703168.png)
+  ![image-20230724142703168](./assets/Nest/image-20230724142703168.png)
 
   - onDelete、onUpdate 设置级联关系
 
@@ -1534,7 +2345,7 @@ from 后的是左表，join 后的是右表。
 
     可以通过给 `@JoinColumn()` 装饰器传入 name 属性指定外键名
 
-    ![image-20230724145654178](Nest.assets/image-20230724145654178.png)
+    ![image-20230724145654178](./assets/Nest/image-20230724145654178.png)
 
 
 
@@ -2224,7 +3035,7 @@ services:
 
 - root 和 alias 区别：**拼接路径时是否包含匹配条件的路径**
 
-  ![image-20230818144715285](Nest.assets/image-20230818144715285.png)
+  ![image-20230818144715285](./assets/Nest/image-20230818144715285.png)
 
 - 默认文件位置
 

@@ -146,4 +146,52 @@ type AnyOf<T extends any[]> = T[number] extends 0 | '' | false | [] | {[key: str
   type FlipArguments<T extends (...args: any[]) => any> = T extends (...args: infer P) => infer U ? (...args: Reverse<P>) => U : never
   ```
 
+- TS 中类相关关键字使用
+
+  **abstract**、**protected**、**get**
+  
+  ```ts
+  import ansiEscapes from "ansi-escapes";
+  
+  export interface Position {
+    x: number;
+    y: number;
+  }
+  /**
+   * abstract 用于定义抽象类或者抽象方法
+   * 抽象类是一种不能被实例化的类，它只用于被继承。抽象类中可以包含抽象方法，抽象方法是一种没有实现的方法，它只定义了方法的签名，而没有具体的实现。
+   */
+  export abstract class BaseUI {
+    private readonly stdout: NodeJS.WriteStream = process.stdout;
+  
+    // protected 关键字用于定义一个受保护的属性或方法，它可以在类的内部和子类中访问，但不能在类的外部访问。
+    protected print(text: string) {
+      process.stdout.write.bind(process.stdout)(text);
+    }
+  
+    protected setbCursorAt({ x, y }: Position) {
+      this.print(ansiEscapes.cursorTo(x, y));
+    }
+  
+    protected printAt(message: string, position: Position) {
+      this.setbCursorAt(position);
+      this.print(message);
+    }
+  
+    protected clearLine(row: number) {
+      this.printAt(ansiEscapes.eraseLine, { x: 0, y: row });
+    }
+  
+    // get 关键字用于定义一个访问器：允许获取对象的属性值，但不提供设置属性值的方法
+    get terminalSize(): { columns: number; rows: number } {
+      return {
+        columns: this.stdout.columns,
+        rows: this.stdout.rows,
+      };
+    }
+  
+    abstract render(): void;
+  }
+  ```
+  
   
