@@ -3432,9 +3432,9 @@ Client secrets：4203d10911279edd49ae2c3a0b53deacc828eb74
 
 ### passport 实现 Google 登录
 
-Client ID：51009918445-q0f028hert72c1vdcu0b7vpenjjgi6pc.apps.googleusercontent.com
+Client ID：xxx.apps.googleusercontent.com
 
-Client secrets：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
+Client secrets：GOCSPX-xxx
 
 > [参考小册](https://juejin.cn/book/7226988578700525605/section/7376480527337193482?enter_from=course_center&utm_source=course_center)
 
@@ -4112,15 +4112,15 @@ swagger 是 openapi 标准的实现，可以在 url 后加个 -json 拿到对应
       port: 25,
       secure: false,
       auth: {
-          user: 'anony2s@163.com',
-          pass: 'YNi4ZqufYQrVmu4m'
+          user: 'test@163.com',
+          pass: 'xxxxxxx'
       },
   });
   
   async function main() {
     const info = await transporter.sendMail({
-      from: '"Anony" anony2s@163.com',
-      to: "ljx1583861@qq.com",
+      from: '"Anony" test@163.com',
+      to: "test@qq.com",
       subject: "测试邮件", 
       html: fs.readFileSync('./bird.html')
     });
@@ -4140,8 +4140,8 @@ swagger 是 openapi 标准的实现，可以在 url 后加个 -json 拿到对应
   import * as fs from 'fs';
   
   const imap = new Imap({
-    user: 'anony2s@163.com',
-    password: 'YNi4ZqufYQrVmu4m',
+    user: 'test@163.com',
+    password: 'xxxxxxxx',
     host: 'imap.163.com',
     port: 993,
     tls: true
