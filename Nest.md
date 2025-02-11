@@ -1033,7 +1033,9 @@ Reflect.defineMetadata 和 Reflect.getMetadata 分别用于设置和获取某个
 
 
 
-## Express 文件上传
+## 文件上传
+
+###  Express 文件上传
 
 > 通过 multer 包实现文件上传
 
@@ -1115,7 +1117,7 @@ Reflect.defineMetadata 和 Reflect.getMetadata 分别用于设置和获取某个
 
 
 
-## Nest 文件上传 
+###  Nest 文件上传 
 
 1. 安装 multer 类型包 `npm install -D @types/multer`
 
@@ -1295,21 +1297,22 @@ Reflect.defineMetadata 和 Reflect.getMetadata 分别用于设置和获取某个
 
 
 
-## 大文件分片上传（待学习）
+###  大文件分片上传（待学习）
 
 
 
 
 
-## OSS上传方案
+###  OSS上传方案
 
 > [掘金小册](https://juejin.cn/book/7226988578700525605/section/7324620995183968293?enter_from=course_center&utm_source=course_center)
 
 
 
 
+## 日志
 
-## Nest 打印日志
+###  Nest 打印日志
 
 - 使用Nest API 进行日志打印
 
@@ -1388,7 +1391,7 @@ Reflect.defineMetadata 和 Reflect.getMetadata 分别用于设置和获取某个
 
 
 
-## Node日志框架：winston
+###  Node日志框架：winston
 
 #### winston 使用
 
@@ -1548,8 +1551,8 @@ export class MyLogger implements LoggerService {
 
 > 或者使用封装好的模块：[nest-winston](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fnest-winston)
 
-
 ## Docker
+###  Docker 命令
 
 - `docker pull`：拉取镜像
 - `docker run --name nginx-test2 -p 80:80 -v /tmp/aaa:/usr/share/nginx/html -e KEY1=VALUE1 -d nginx:latest `
@@ -1579,7 +1582,7 @@ export class MyLogger implements LoggerService {
 
 
 
-## DockerFile
+###  DockerFile
 
 - ```typescript
   FROM node:latest
@@ -1614,7 +1617,7 @@ export class MyLogger implements LoggerService {
 
 
 
-## 27、Nest 编写 Dockerfile
+###  Nest 编写 Dockerfile
 
 - .dockerignore文件：忽略哪些文件 - 即构建的时候不会参与
 
@@ -1634,17 +1637,16 @@ export class MyLogger implements LoggerService {
   ```
 
   - ***.md**：忽略所有md结尾的文件
-  - **!README.md**：不包含README.md文件
+  - **!README.md**：其中不包含README.md文件（即不忽略此文件）
   - **node_modules/**：忽略 node_modules 下 的所有文件
   - **[a-c].txt**：忽略 a.txt、b.txt、c.txt 这三个文件
-  
-  
+  - **.DS_Store**：是 mac 的用于指定目录的图标、背景、字体大小的配置文件，这个一般都要忽略
   
 - 使用多阶段构建和 alpine 减小构建镜像体积
 
   ```dockerfile
-  # 第一次构建 - nest 打包
-  FROM node:lts-alpine as build-stage
+  # 第一次构建 - nest 打包 as 提供名字（注意此处为大写 AS）
+  FROM node:lts-alpine AS build-stage
   
   WORKDIR /app
   
@@ -1654,12 +1656,13 @@ export class MyLogger implements LoggerService {
   # RUN npm config set registry https://registry.npmmirror.com 
   RUN npm install
   
+  # 这里因为 dockerignore 忽略node_mosules 文件夹，只会将代码拷贝过来，使用上层构建的node_modules，如果 package文件没有变化，则会直接使用缓存减小构建时间
   COPY . .
   
   RUN npm run build
   
   # 第二次构建 - 将第一次构建的 dist 复制出来
-  FROM node:lts-alpine as production-stage
+  FROM node:lts-alpine AS production-stage
   
   COPY --from=build-stage /app/dist /app
   COPY --from=build-stage /app/package.json /app/package.json
@@ -1673,15 +1676,19 @@ export class MyLogger implements LoggerService {
   CMD ["node", "/app/main.js"]
   ```
 
+![img](./assets/Nest/44d6f9cda22347d1acab3a0cf0b26887tplv-k3u1fbpfcp-jj-mark0000q75.webp)  
 
-
-## 28、提升 Dockerfile
+###  提升 Dockerfile 水平
 
 - 使用 alpine 基础镜像构建 - 减小构建镜像体积
 
 - 使用多阶段构建 - 去掉不必要的文件
 
 - package.json 单独安装，利用 Docker 缓存加快构建速度
+
+  - **docker 是分层存储的，dockerfile 里的每一行指令是一层，会做缓存。**
+
+    **每次 docker build 的时候，只会从变化的层开始重新构建，没变的层会直接复用**
 
 - 使用 **ARG** 增加构建灵活性
 
@@ -1706,13 +1713,13 @@ export class MyLogger implements LoggerService {
   - `docker build --build-arg aaa=3 --build-arg bbb=4 -t arg-test -f 333.Dockerfile .` 构建的时候通过 `--build-arg` 传入对应的参数
 
   - 运行之后可以通过 `process.env.aaa`拿到对应的参数值
-  
+
 - **CMD** 和 **ENTRYPOINT**
 
   - 当 `docker run` 执行时，如果传入有命令，则会覆盖 CMD 的命令，而 ENTRYPOINT 则不会
-  
+
   - 还可以将 ENTRYPOINT和CMD结合起来，CMD 会被覆盖，类似于默认值
-  
+
     ```dockerfile
     FROM node:lts-apline
     
@@ -1720,7 +1727,7 @@ export class MyLogger implements LoggerService {
     
     CMD ["到此一游"]
     ```
-  
+
 - **COPY** 和 **ADD**
 
   - tar 命令打包 `tar -zcvf a.tar.gz ./a `
@@ -1738,15 +1745,28 @@ export class MyLogger implements LoggerService {
 
 
 
-## 29、Docker是怎么实现的
+### 使用 PNPM
+
+```
+
+```
+
+
+
+###  Docker是怎么实现的
 
 - Namespace：实现各种资源的隔离
 - Control Group：实现容器进程的资源访问限制
 - UnionFS：实现容器文件系统的分层存储，镜像合并
+- 我们通过 dockerfile 描述镜像构建的过程，每一条指令都是一个镜像层。
+
+  镜像通过 docker run 就可以跑起来，对外提供服务，这时会添加一个可写层（容器层）。
+
+  挂载一个 volume 数据卷到 Docker 容器，就可以实现数据的持久化。
 
 
 
-## 30、PM2
+## PM2
 
 - `pm2 start xxx --max-memory-restart 200M`：超过200M自动重启
 - `pm2 start xxx --cron-restart "2/3 * * * * *"`：从2s开始每3s启动一次
@@ -1766,9 +1786,9 @@ export class MyLogger implements LoggerService {
   ![image-20230718155653797](./assets/Nest/image-20230718155653797.png)
   - 注意：通过pm2 start在docker内启动进程会死掉，导致起不来,pm2 是默认后台启动的， docker 感知不到,CMD命令执行完成，docker 容器就结束了。**pm2-runtime** 是专门为容器设计的，保证在后台一直运行
 
+## MySQL
 
-
-## 31、MySQL
+###  MySQL
 
 - 创建表
 
@@ -1822,7 +1842,7 @@ export class MyLogger implements LoggerService {
 
 
 
-## 32、SQL 查询语句的所有语法和函数
+###  SQL 查询语句的所有语法和函数
 
 - 指定查询列、通过 **as** 修改返回列名：`SELECT name as "名字", score as "分数" FROM student;`
 
@@ -1864,13 +1884,15 @@ export class MyLogger implements LoggerService {
   
     `select avg(score) as '平均成绩',count(*) as '人数',sum(score) as '总成绩',min(score) as '最低分', max(score) as '最高分' from student` 
   
+    ![image-20241226150844596](./assets/Nest/image-20241226150844596.png)  
+  
   - **字符串函数：**CONCAT、SUBSTR、LENGTH、UPPER、LOWER
   
     `SELECT CONCAT('xx', name, 'yy'), SUBSTR(name,2,3), LENGTH(name), UPPER('aa'), LOWER('TT') FROM student;`
   
     其中**substr**第二个参数表示开始的下标（mysql 下标从1开始），例如：substr('一二三', 2, 3) 为 '二三'
   
-  - **数值函数：**ROUND：四舍五入、CEIL：向上取整、FLOOR：向下取整、ABS：绝对值、MOD：取模
+  - **数值函数：**ROUND：四舍五入、CEIL：向上取整、FLOOR：向下取整、ABS：绝对值、MOD：取模（即取余数）
   
     `SELECT ROUND(1.234567, 2), CEIL(1.234567), FLOOR(1.234567), ABS(-1.234567), MOD(5, 2);`
   
@@ -1886,6 +1908,8 @@ export class MyLogger implements LoggerService {
     - case：`SELECT name, score, CASE WHEN score >=90 THEN '优秀' WHEN score >=60 THEN '良好'ELSE '差' END AS '档次' FROM student;` 适用多个条件
   
   - **系统函数：**`select VERSION(), DATABASE(), USER()`
+  
+    ![image-20241226152517523](./assets/Nest/image-20241226152517523.png)  
   
   - **其他函数：**
   
@@ -1922,9 +1946,9 @@ export class MyLogger implements LoggerService {
   
     - STR_TO_DATE：`SELECT STR_TO_DATE('2023-06-01', '%Y-%m-%d');`
 
+> 这里要注意下，当作字符串值用的时候，需要加单引号或者双引号。当作表名、列名用的时候，用反引号或者不加引号。
 
-
-## 33、一对一
+###  一对一、join、级联
 
 从表里通过外键来关联主表的主键。
 
@@ -1964,7 +1988,7 @@ from 后的是左表，join 后的是右表。
 
 
 
-## 34、一对多、多对多
+###  一对多、多对多
 - 一对多与一对一逻辑相同，主要多个数据对应同一个父表id
 
 - 多对对
@@ -1989,7 +2013,7 @@ from 后的是左表，join 后的是右表。
 
 
 
-## 35、子查询 和 EXISTS
+###  子查询 和 EXISTS
 - `SELECT name, class FROM student WHERE score = (SELECT MAX(score) FROM student);
   `
 
@@ -2021,13 +2045,7 @@ from 后的是左表，join 后的是右表。
 
 
 
-
-
-## 36、综合练习（略）
-
-
-
-## 37、MySQL的事务和隔离级别
+###  MySQL的事务和隔离级别
 
 **事务**
 
@@ -2041,11 +2059,11 @@ from 后的是左表，join 后的是右表。
 - **REPEATABLE READ**：在同一事务内，多次读取数据将保证结果相同。
 - **SERIALIZABLE**：在同一时间只允许一个事务修改数据。
 
+> ROLLBACK TO SAVEPOINT使用时需要检查autocommit是否关闭，select @@autocommit;查看，如果是1，代表对于每条statement来说，都会自动形成一个commit，也就是会即时对开始和结束一个事务。执行set autocommit = 0;关闭
 
 
 
-
-## 38、MySQL 的视图、存储过程和函数（了解）
+###  MySQL 的视图、存储过程和函数（了解）
 
 **视图：**
 
@@ -2069,7 +2087,7 @@ from 后的是左表，join 后的是右表。
 
 
 
-##  39、Node 操作 MySQL 的两种方式
+###  Node 操作 MySQL 的两种方式
 
 **使用 mysql2 直接连接**
 
@@ -2082,9 +2100,11 @@ from 后的是左表，join 后的是右表。
 
 
 
+## TyoeORM
 
 
-## 40、掌握 TypeORM
+
+### 掌握 TypeORM
 
 - 新建 TypeORM项目：`npx typeorm@latest init --name typeorm-all-feature --database mysql`
 
@@ -2210,11 +2230,11 @@ from 后的是左表，join 后的是右表。
     })
     ```
   
-  - **findOne：**查询一条，其实质为 find 查询后 limit：1
+  - **findOne：**查询一条，其实质为 find 查询后 LIMIT 1
   
     ```typescript
     const user = await AppDataSource.manager.findOne(User, {
-        select: { // 指定列
+        select: { // 指定列，查询时返回哪些字段
             firstName: true,
             age: true
         },
@@ -2227,7 +2247,7 @@ from 后的是左表，join 后的是右表。
     });
     ```
   
-  - **findOneBy**
+  - **findOneBy**：查找单条记录，第二个参数直接指定 where 条件，更简便一点
   
     ```typescript
     const user = await AppDataSource.manager.findOneBy(User, {
@@ -2252,7 +2272,7 @@ from 后的是左表，join 后的是右表。
         .getOne();
     ```
   
-  - 开启事务：使用 transition 方法包裹
+  - **开启事务**：使用 transition 方法包裹
   
     ```typescript
     await AppDataSource.manager.transaction(async manager => {
@@ -2265,17 +2285,30 @@ from 后的是左表，join 后的是右表。
     });
     ```
   
-    
-  
-## 41、TypeORM 一对一
+  > 可以先调用 `getRepository` 传入 Entity，拿到专门处理这个 Entity 的增删改查的类，再调用这些方法
+  >
+  > ```js
+  > await AppDataSource.manager.getRepository(User).findOneBy({
+  >   firstName: "Timber",
+  >   lastName: "Saw",
+  > });
+  > ```
 
-- 关联：使用 `@JoinColum` 定义外键列， `@OneToTone`创建对应关系
+- 总结
+
+  ![img](./assets/Nest/df762fa8ccb948f6ae3ca66a92640975tplv-k3u1fbpfcp-jj-mark3326000q75.webp)  
+
+
+
+### TypeORM 一对一
+
+- **关联**：使用 `@JoinColum` 定义外键列， `@OneToTone`创建对应关系
 
   ![image-20230724142703168](./assets/Nest/image-20230724142703168.png)
 
   - onDelete、onUpdate 设置级联关系
 
-  - cascade 设置为 true，表示按照级联关系进行增删
+  - cascade 设置为 true，并不是数据库的级联，而是告诉 typeorm 当你增删改一个 Entity 的时候，是否级联增删改它关联的 Entity
 
     ```typescript
     const user = new User();
@@ -2291,14 +2324,14 @@ from 后的是左表，join 后的是右表。
         await AppDataSource.manager.save(idCard);
     ```
 
-- 查询
+- **查询**
 
   - 使用 relations 关联查询
 
     ```typescript
     const idcards = await AppDataSource.manager.find(IdCard, {
       relations: {
-        user: true,
+        user: true, // 传入此属性即可关联查询
       },
     });
     console.log(idcards);
@@ -2308,9 +2341,9 @@ from 后的是左表，join 后的是右表。
 
     ```typescript
     const idcards = await AppDataSource.manager
-      .getRepository(IdCard)
-      .createQueryBuilder("idcard")
-      .leftJoinAndSelect("idcard.user", "user")
+      .getRepository(IdCard) // 拿到操作 IdCard 的 Repository 对象
+      .createQueryBuilder("idcard") // 连接查询，并起别名为 idcard
+      .leftJoinAndSelect("idcard.user", "user") // 连接到 idcard.user, 起别名 user
       .getMany();
     console.log(idcards);
     ```
@@ -2325,8 +2358,27 @@ from 后的是左表，join 后的是右表。
     console.log(idcards2);
     ```
 
-  - 没有外键列进行联表查询
+- **修改**：设置 cascade 为 true 之后就可以直接联动修改了
+  
+  - ```js
+    const user = new User();
+    user.id = 1;
+    user.firstName = 'guang1111';
+    user.lastName = 'guang1111';
+    user.age = 20;
+    
+    const idCard = new IdCard();
+    idCard.id = 1;
+    idCard.cardName = '22222';
+    idCard.user = user;
+    
+    await AppDataSource.manager.save(idCard);
+    ```
 
+- **删除**：和修改相似，会进行级联删除，删除user，idCard 会同时删除，反过来则不
+  
+  - 没有外键列进行联表查询
+  
     ```typescript
     // 设置 OneToOne
     @OneToOne(() => IdCard, (IdCard) => IdCard.user)
@@ -2340,16 +2392,51 @@ from 后的是左表，join 后的是右表。
     });
     console.log(user);
     ```
+  
+- user 里访问 idCard
+  
+  - user Entity 里添加@OneToOne 的装饰器
+    
+    ```ts
+    @Entity()
+    export class User {
+      @PrimaryGeneratedColumn()
+      id: number;
+    
+      @Column()
+      firstName: string;
+    
+      @Column()
+      lastName: string;
+    
+      @Column()
+      age: number;
+      // 这里通过第二个参数告诉 typeorm，外键是另一个 Entity 的哪个属性
+      @OneToOne(() => IdCard, (idCard) => idCard.user)
+      idCard: IdCard;
+    }
+    ```
+    
+  - 使用
+  
+    ```ts
+    const user = await AppDataSource.manager.find(User, {
+        relations: {
+            idCard: true
+        }
+    });
+    console.log(user)
+    ```
 
-    **注意：**如果没有显式地指定外键名，TypeORM 会将目标实体（被关联的实体）的表名和主键列名组合起来，作为键名。
-
-    可以通过给 `@JoinColumn()` 装饰器传入 name 属性指定外键名
-
-    ![image-20230724145654178](./assets/Nest/image-20230724145654178.png)
+**注意：**如果没有显式地指定外键名，TypeORM 会将目标实体（被关联的实体）的表名和主键列名组合起来，作为键名。
+可以通过给 `@JoinColumn()` 装饰器传入 name 属性指定外键名
+![image-20230724145654178](./assets/Nest/image-20230724145654178.png)
 
 
 
-## 42、TypeORM一对多
+
+
+### TypeORM一对多
 
 - 与一对一类似，在多的一方使用 **@ManyToOne** 装饰器
 
@@ -2365,13 +2452,72 @@ from 后的是左表，join 后的是右表。
   department: Department;
   ```
 
+- 插入时
+
+  - 如果没有设置 cascade，则需要手动插入
+
+    ```ts
+    const d1 = new Department();
+    d1.name = '技术部';
+    
+    const e1 = new Employee();
+    e1.name = '张三';
+    e1.department = d1; // 这里需要指定关联键，即由@OneToMany装饰的字段
+    // @ManyToOne(() => Department)
+    //   department: Department;
+    
+    const e2 = new Employee();
+    e2.name = '李四';
+    e2.department = d1;
+    
+    const e3 = new Employee();
+    e3.name = '王五';
+    e3.department = d1;
+    
+    await AppDataSource.manager.save(Department, d1);
+    await AppDataSource.manager.save(Employee,[e1, e2, e3]);
+    ```
+
+  - 如果设置了 cascade，则可以通过下面方法插入
+
+    ```ts
+    const e1 = new Employee();
+    e1.name = "张三";
+    
+    const e2 = new Employee();
+    e2.name = "李四";
+    
+    const e3 = new Employee();
+    e3.name = "王五";
+    
+    const d1 = new Department();
+    d1.name = "技术部";
+    d1.employees = [e1, e2, e3]; // 这里因为设置了 cascade ，直接指定@OneToMany装饰的字段
+    // @OneToMany(() => Employee, (employee) => employee.department, {
+    //    cascade: true,
+    //  })
+    //  employees: Employee[];
+    
+    await AppDataSource.manager.save(Department, d1);
+    ```
+
+  - **注意：**
+
+    一对一的时候我们还通过 @JoinColumn 来指定外键列，为什么一对多就不需要了呢？
+
+    因为一对多的关系只可能是在多的那一方保存外键呀，所以并不需要 @JoinColumn。
+
+    不过你也可以通过 @JoinColumn 来修改外键列的名字
+
 - 查询与一对一相似
 
+- 删除可以通过手动删除，先删除 employee数据，再删除 department 数据；或者设置 onDelete 为 SET NULL 或者 CASCADE
+
+![image-20250102220537814](./assets/Nest/image-20250102220537814.png)  
 
 
 
-
-## 43、TypeORM多对多
+### TypeORM多对多
 
 - 如一篇文章有多个标签
 
@@ -2385,14 +2531,32 @@ from 后的是左表，join 后的是右表。
 
 - 查询同上
 
-- 如果删除标签或者删除文章，中间表对应都会删除
+- 修改
+
+  ```ts
+  const article = await AppDataSource.manager.findOne(Article, {
+    where: {
+      id: 2,
+    },
+    relations: {
+      tags: true,
+    },
+  });
+  
+  article.title = "ccccc";
+  article.tags = article.tags.filter(item => item.name.includes("ttt1111")); // 这里修改文章标签多个为一个，会自动将多余中间表关系删除
+  
+  await AppDataSource.manager.save(article);
+  ```
+
+- 删除：中间表默认为 CASCADE，如果删除标签或者删除文章，中间表对应都会删除
 
 **标签包含文章：**
 
 - 在标签里加映射属性
 
   ```typescript
-  @ManyToMany(() => Article, (article) => article.tags)
+  @ManyToMany(() => Article, (article) => article.tags) // 这里第二个参数指定外键列在哪里，同时 Article 中也需要做修改
   articles: Article[];
   ```
 
@@ -2406,11 +2570,21 @@ from 后的是左表，join 后的是右表。
 
   其中 `@JoinTable()` 用于生成中间表
 
+- **注意：**
 
+  因为如果当前 Entity 对应的表是包含外键的，那它自然就知道怎么找到关联的 Entity。
 
+  但如果当前 Entity 是不包含外键的那一方，怎么找到对方呢？
 
+  这时候就需要手动指定通过哪个外键列来找当前 Entity 了。
 
-## 44、Nest 中集成 TypeORM
+  之前 OneToOne、OnToMany 都是这样：
+
+  比如一对一的 user 那方，不维护外键，所以需要第二个参数来指定通过哪个外键找到 user。
+
+  
+
+### Nest 中集成 TypeORM
 
 1. 引入 `npm install --save @nestjs/typeorm typeorm mysql2`
 
@@ -2442,7 +2616,7 @@ from 后的是左表，join 后的是右表。
    import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
    
    @Entity({
-     name: 'aaa_user',
+     name: 'aaa_user', // 设置数据库中的表名，可不设置
    })
    export class User {
      // 自增字段
@@ -2451,7 +2625,7 @@ from 后的是左表，join 后的是右表。
    
      // 普通字段
      @Column({
-       name: 'aaa_name',
+       name: 'aaa_name', // 数据库中的列名，可不设置
        length: 50,
      })
      name: string;
@@ -2505,16 +2679,426 @@ from 后的是左表，join 后的是右表。
    }
    ```
 
+   - 另一种使用方法，使用 forFeature 注入模块，每次使用就无需注入，**但是只能用来操作当前的 Entity**
    
+     - User模块中imports
+   
+       ![image-20250103142607038](./assets/Nest/image-20250103142607038.png)  
+   
+     - 使用
+   
+       ![image-20250103142805845](./assets/Nest/image-20250103142805845.png)  
 
 
 
-## 45、Redis
+### TypeORM 保存任意层级关系
 
+1. 创建 Entity
+
+   ```ts
+   import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, Tree, TreeChildren, TreeParent, UpdateDateColumn } from "typeorm";
+   
+   @Entity()
+   @Tree('closure-table')
+   export class City {
+       @PrimaryGeneratedColumn()
+       id: number;
+   
+       @Column({ default: 0 })
+       status: number;
+   
+       @CreateDateColumn()
+       createDate: Date;
+   
+       @UpdateDateColumn()
+       updateDate: Date;
+       
+       @Column()
+       name: string;
+   
+       @TreeChildren()
+       children: City[];
+   
+       @TreeParent()
+       parent: City;
+   }
+   ```
+
+   - @TreeChildren：存储 children 节点
+
+   - @TreeParent：存储 parent 节点
+
+   - @Tree：必须使用此装饰器声明 Entity，其中参数可以指定4种存储模式，一般用 **closure-table**，或者 **materialized-path**
+
+     - closure-table 会生成两个表来存储对应关系
+     - materialized-path 会加一个 mpath 字段存储
+     - 其余两种有缺陷，不推荐使用
+
+     ![img](./assets/Nest/7169db370cfb447087144e5230fd3a14tplv-k3u1fbpfcp-jj-mark2495000q75.webp)  
+
+     ![image-20250103160006376](./assets/Nest/image-20250103160006376.png)  
+
+2. 使用
+
+   - **插入数据**
+
+     ```ts
+     @InjectEntityManager()
+     entityManager: EntityManager;
+     
+     async findAll() {
+         const city = new City();
+         city.name = '华北';
+         await this.entityManager.save(city);
+     
+         const cityChild = new City()
+         cityChild.name = '山东'
+         const parent = await this.entityManager.findOne(City, {
+           where: {
+             name: '华北'
+           }
+         });
+         if(parent){
+           cityChild.parent = parent
+         }
+         await this.entityManager.save(City, cityChild)
+     
+         return this.entityManager.getTreeRepository(City).findTrees(); // 这里使用 findTrees 查询出树形结构
+     }
+     ```
+
+   - **findTrees** 查询所有属性结构（使用 **find** 会返回扁平结构）
+
+     ```ts
+     this.entityManager.getTreeRepository(City).findTrees();
+     ```
+   
+   - **findRoots** 查询所有根节点
+   
+     ```ts
+     return this.entityManager.getTreeRepository(City).findRoots()
+     ```
+   
+   - **findDescendantsTree** 查询某个节点的所有后代节点
+   
+     ```ts
+     const parent = await this.entityManager.findOne(City, {
+       where: {
+         name: '云南'
+       }
+     });
+     this.entityManager.getTreeRepository(City).findDescendantsTree(parent)
+     ```
+   
+   - **findAncestorsTree** 是查询某个节点的所有祖先节点
+   
+     ```ts
+     const parent = await this.entityManager.findOne(City, {
+       where: {
+         name: '云南'
+       }
+     });
+     this.entityManager.getTreeRepository(City).findAncestorsTree(parent)
+     ```
+   
+   - **findAncestors**、**findDescendants** 就是用扁平结构返回
+   
+   - **countAncestors**、**countDescendants**：计数
+   
+     ```ts
+     findAll() {
+       const parent = await this.entityManager.findOne(City, {
+       where: {
+         name: '云南'
+       }
+     });
+     this.entityManager.getTreeRepository(City).countAncestors(parent)
+     ```
+   
+     
+
+### TypeORM的 migration 迁移功能
+
+> 设置 data-source 的 synchronize： true 之后每次修改  Entity 都会修改数据库表，所以生产环境容易造成数据丢失等问题，一般使用  TypeORM 的 migration 功能
+
+**手动操作（了解）**
+
+1. 执行 migration:create 命令，生成 `时间戳-Aaa.ts` 文件
+
+   ```shell
+   npx ts-node ./node_modules/typeorm/cli migration:create ./src/migration/Aaa
+   ```
+
+2. 将数据库导出，并将建表语句添加至 migration 文件夹下文件中
+
+   ![image-20250103165607465](./assets/Nest/image-20250103165607465.png)  
+
+3. 配置 data-source 文件
+
+   ![img](./assets/Nest/08f60a08ae094c8096a91710392aec6ftplv-k3u1fbpfcp-jj-mark3326000q75.webp)  
+
+4. 使用 migration:run 手动建表
+
+   ```shell
+   npx ts-node ./node_modules/typeorm/cli migration:run -d ./src/data-source.ts
+   ```
+
+5. 此时会建立两张表，其中 migrations 会记录时间及迁移
+
+   ![image-20250103170008202](./assets/Nest/image-20250103170008202.png)  
+
+
+
+**简便方法（常用）**：
+
+1. 使用 migration:generate 生成
+
+   ```shell
+   npx ts-node ./node_modules/typeorm/cli migration:generate ./src/migration/Aaa -d ./src/data-source.ts
+   ```
+
+2. 用 migration:run 执行下
+
+   ```ts
+   npx ts-node ./node_modules/typeorm/cli migration:run -d ./src/data-source.ts
+   ```
+
+3. 注意：修改表结构也需要重新执行以上步骤
+
+4. 撤销操作
+
+   ```ts
+   npx ts-node ./node_modules/typeorm/cli migration:revert -d ./src/data-source.ts
+   ```
+
+   执行 migration:revert 会执行上次的 migration 的 down 方法，并且从 migrations 表里删掉执行记录。**可以进行多次 revert**
+
+5. 将命令封装进 script
+
+   ```js
+   "migration:create": "npm run typeorm -- migration:create",
+   "migration:generate": "npm run typeorm -- migration:generate -d ./src/data-source.ts",
+   "migration:run": "npm run typeorm -- migration:run -d ./src/data-source.ts",
+   "migration:revert": "npm run typeorm -- migration:revert -d ./src/data-source.ts"
+   ```
+
+6. 总结
+
+   - migration:create：生成空白 migration 文件
+   - migration:generate：连接数据库，根据 Entity 和数据库表的差异，生成 migration 文件
+   - migration:run：执行 migration，会根据数据库 migrations 表的记录来确定执行哪个
+   - migration:revert：撤销上次 migration，删掉数据库 migrations 里的上次执行记录
+
+
+
+
+
+### Nest 项目使用 TypeORM 迁移
+
+1. 创建 `src/data-source.ts`，将 AppModule 中的 synchronize 关闭
+
+   ```ts
+   import { DataSource } from "typeorm";
+   import { Article } from "./article/entities/article.entity";
+   
+   export default new DataSource({
+       type: "mysql",
+       host: "localhost",
+       port: 3306,
+       username: "root",
+       password: "guang",
+       database: "nest-migration-test",
+       synchronize: false, // 这里关闭，不自动创建表结构，同时关闭 AppModule 中的配置
+       logging: true,
+       entities: [Article],
+       poolSize: 10,
+       migrations: ['src/migrations/**.ts'],
+       connectorPackage: 'mysql2',
+       extra: {
+           authPlugin: 'sha256_password',
+       }
+   });
+   ```
+
+2. 添加几个 Scripts 
+
+   ```shell
+   "typeorm": "ts-node ./node_modules/typeorm/cli",
+   "migration:create": "npm run typeorm -- migration:create",
+   "migration:generate": "npm run typeorm -- migration:generate -d ./src/data-source.ts",
+   "migration:run": "npm run typeorm -- migration:run -d ./src/data-source.ts",
+   "migration:revert": "npm run typeorm -- migration:revert -d ./src/data-source.ts"
+   ```
+
+3. 执行 migration:generate 命令
+
+   ```shell
+   npm run migration:generate src/migrations/init
+   ```
+
+   - 这里会创建 migrations 文件夹 及 时间戳+init.ts 的文件
+
+   - 并会对比 entity 和数据表的差异，生成迁移 sql
+
+4. 执行 npm run migration:run 命令，即会执行之前创建的迁移 sql 
+
+   - **这里migrations 表里记录了执行过的 migration，已经执行过的不会再执行。**
+
+5. 再创建一个 migration 来初始化数据
+
+   ```shell
+   npm run migration:create src/migrations/data
+   ```
+
+   - **migration:generate 只会根据表结构变动生成迁移 sql，而数据的插入的 sql 需要我们自己添加。**
+
+   ```ts
+   export class Data1735898276429 implements MigrationInterface {
+     public async up(queryRunner: QueryRunner): Promise<void> {
+       await queryRunner.query(
+         // 这里使用数据插入语句可以使用 MySql 点击备份数据生成的语句
+       );
+     }
+   
+     public async down(queryRunner: QueryRunner): Promise<void> {
+        // 如果要支持 revert，那 down 方法里应该补上 delete 语句
+     }
+   }
+   ```
+
+6. npm run migration:run，此时之前执行过的语句不会再次执行
+
+> Entity 中新增字段同样可以使用以上步骤生成表结构，而不是使用 synchronize: true 配置自动生成
+
+
+
+**将数据库配置提取为 env**
+
+1. src 创建 .env 文件
+
+   ```js
+   # mysql 相关配置
+   mysql_server_host=localhost
+   mysql_server_port=3306
+   mysql_server_username=root
+   mysql_server_password=guang
+   mysql_server_database=nest-migration-test
+   ```
+
+2. AppModule 里读取见下节
+
+3. data-source 里读取
+
+   1. 安装 dotenv `npm install --save-dev dotenv`
+
+   2. 使用
+
+      ```ts
+      import { DataSource } from 'typeorm';
+      import { Article } from './ariticle/entities/ariticle.entity';
+      import { config } from 'dotenv';
+      
+      config({
+        path: 'src/.env',
+      });
+      
+      console.log(process.env);
+      
+      export default new DataSource({
+        type: 'mysql',
+        host: `${process.env.mysql_server_host}`,
+        port: +`${process.env.mysql_server_port}`,
+        username: `${process.env.mysql_server_username}`,
+        password: `${process.env.mysql_server_password}`,
+        database: `${process.env.mysql_server_database}`,
+        synchronize: false,
+        logging: true,
+        entities: [Article],
+        poolSize: 10,
+        migrations: ['src/migrations/**.ts'],
+        connectorPackage: 'mysql2',
+      });
+      ```
+
+      
+
+## 动态读取不同环境配置
+
+- powershell 设置临时环境变量
+
+  ```shell
+  $env:变量名 = "值"
+  
+  # 获取
+  echo $env:变量名
+  ```
+
+### nodejs 中使用 dotenv
+
+  1. 安装：`npm install dotenv`
+
+  2. 添加env配置文件
+
+     ![image-20250106143026426](./assets/Nest/image-20250106143026426.png)  
+
+- nodejs 使用 yaml 格式的配置文件
+
+  1. 安装包：`npm install js-yaml`
+
+  2. 使用
+
+     ![image-20250106143946746](./assets/Nest/image-20250106143946746.png)  
+
+> **yaml 的格式更适合有层次关系的配置，而 .env 更适合简单的配置。**
+
+### Nest 中使用
+#### env
+  1. 安装：`npm install --save @nestjs/config`
+  
+  2. 使用：module 里面可以引入多个文件，**前面的配置会覆盖后面的配置**
+  
+     ![image-20250107101700510](./assets/Nest/image-20250107101700510.png)  
+#### 使用ts配置
+
+支持异步
+
+![image-20250107103204965](./assets/Nest/image-20250107103204965.png)  
+
+通过读取 yaml 文件实现yaml 文件加载
+
+```ts
+// config.ts
+import { readFile } from 'fs/promises';
+import * as yaml from 'js-yaml';
+import { join } from 'path';
+
+export default async () => {
+    const configFilePath = join(process.cwd(), 'aaa.yaml');
+
+    const config = await readFile(configFilePath, {
+        encoding: 'utf-8'
+    });
+
+    return yaml.load(config);
+};
+```
+
+forFeature 方法来返回动态模块（在某一模块中进行局部注册配置）
+
+> 如果要在其他模块访问 configService，需要在AppModule 中注册时添加 isGlobal： true
+
+![image-20250107104921760](./assets/Nest/image-20250107104921760.png)  
+
+
+
+
+
+## Redis
+### 基础使用
 1. 安装：docker里搜索 redis - run 填入数据
 2. docker 里使用 `redis-cli`命令进行交互
 3. 命令：
-   - set、get：设置和取值
+   - set、get：设置和取值（不适用于 list）
    - incr：递增，如 `incr key1`，每调用一次值就会增一
    - keys：查询所有 key：`keys "*"` `keys "key*"`
    - lpush：从左添加 list 数据：`lpush list1 111`
@@ -2535,13 +3119,11 @@ from 后的是左表，join 后的是右表。
 
 
 
-
-
-## 46、 Nest 里操作 Redis
+### Nest 里使用
 
 1. 安装 Redis 包：`npm install redis`
 
-2. 添加 provider：
+2. AppModule 添加自定义 provider：
 
    ```typescript
    {
@@ -2582,17 +3164,40 @@ from 后的是左表，join 后的是右表。
 
    注意：这里使用了 async/await 在 controller 里面也需要添加
 
+> 这里不推荐使用官方推荐的 cache-manage 操作 Redis
+
+
+
+## 登录及权限控制
+
+
+
+### JWT 和 session
+
+#### 服务器存储 session + cookie 
+
+> session + cookie 的给 http 添加状态的方案是服务端保存 session 数据，然后把 id 放入 cookie 返回，cookie 是自动携带的，每个请求可以通过 cookie 里的 id 查找到对应的 session，从而实现请求的标识。
+
+问题：
+
+- CSRF：当前登录的网站请求别的网站时也会携带cookie，造成危险。可以通过 服务器生成并验证唯一的Token、验证Referer解决
+
+- 分布式 session：不同服务器之间进行同步问题，可以通过 各台服务器之间自动复制 session、将session 保存在一台服务器中的redis 中解决，通产使用这种方式
+
+- 跨域：跨域请求不会携带cookie，虽然可以设置为顶级域名，顶级域名不同时仍不会携带cookie
+
+#### 客户端存储的 token
+
+> token 的方案常用 json 格式来保存，叫做 json web token，简称 JWT，由 header、payload、verify signature 三部分组成
+
+- header 部分保存当前的加密算法
+- payload 部分是具体存储的数据
+- verify signature 部分是把 header 和 payload 还有 salt 做一次加密之后生成的
 
 
 
 
-## 47、JWT 和 session（概念略）
-
-
-
-
-
-## 48、Nest 实现 Session 和 JWT
+### Nest 实现 Session 和 JWT
 
 - **Session + Cookie 方式**
 
@@ -2618,6 +3223,7 @@ from 后的是左表，join 后的是右表。
      bootstrap();
      ```
 
+     - **secret** 加密密钥
      - **resave** 为 true 是每次访问都会更新 session，不管有没有修改 session 的内容，而 false 是只有 session 内容变了才会去更新 session。
      - **saveUninitalized** 设置为 true 是不管是否设置 session，都会初始化一个空的 session 对象。比如你没有登录的时候，也会初始化一个 session 对象，这个设置为 false 就好。
 
@@ -2710,19 +3316,27 @@ from 后的是左表，join 后的是右表。
 
 
 
-## 49、登陆注册（案例练习）
+### 登陆注册（案例练习）
+
+[小册](https://juejin.cn/book/7226988578700525605/section/7243417086767136828?enter_from=course_center&utm_source=course_center)
+
+通过 JWT 实现登录，同时 validationPipe 做参数校验，guard 做接口权限校验
+
+TypeORM + SQL 做数据存储，密码存储通过 crypto 进行加密处理
 
 
 
+###  基于 ACL 实现权限控制（练习）
+
+记录每个用户有什么权限的方式，叫做访问控制表（Access Control List）
+
+用户和权限是多对多关系，存储这种关系需要用户表、角色表、用户-角色的中间表
+
+这里可以结合 Redis 把查询到的权限进行缓存并设置ttl，下次再进行查找时就不用查询数据库了
 
 
-## 50、基于 ACL 实现权限控制（练习）
 
-
-
-
-
-## 51、基于 RBAC 实现权限控制（练习）
+### 基于 RBAC 实现权限控制（练习）
 
 - 登录接口控制的两种思路：
   1. 通过设置全局 Guard 对所有接口拦截，但后通过 setMetaData 设置可以通过的标志，在Guard里进行获取判断
@@ -2732,7 +3346,29 @@ from 后的是左表，join 后的是右表。
   1. 通过 `app.useGlobalXXX(new XXX())` 方式设置，此方式无法使用 useFactory 等方法
   2. 通过在 appModule 里面 providers 设置，注意参数中 provide 字段使用nest提供的对应字段
 
-## 52、基于 access_token 和 refresh_token 无感刷新
+总结：
+
+通过 jwt 实现了登录，把用户和角色信息放到 token 里返回。
+
+添加了 LoginGuard 来做登录状态的检查。
+
+然后添加了 PermissionGuard 来做权限的检查。
+
+LoginGuard 里从 jwt 取出 user 信息放入 request，PermissionGuard 从数据库取出角色对应的权限，检查目标 handler 和 controller 上声明的所需权限是否满足。
+
+LoginGuard 和 PermissionGuard 需要注入一些 provider，所以通过在 AppModule 里声明 APP_GUARD 为 token 的 provider 来注册的全局 Gard。
+
+然后在 controller 和 handler 上添加 metadata 来声明是否需要登录，需要什么权限，之后在 Guard 里取出来做检查。
+
+这种方案查询数据库也比较频繁，也应该加一层 redis 来做缓存。
+
+当然，这是 RBAC0 的方案，更复杂一点的权限模型，可能会用 RBAC1、RBAC2 等，那个就是多角色继承、用户组、角色之间互斥之类的概念，会了 RBAC0，那些也就是做一些变形的事情。
+
+绝大多数系统，用 RBAC0 就足够了。
+
+
+
+### 基于 access_token 和 refresh_token 无感刷新
 
 - 登陆的时候将 access_token 和 refresh_token 都返回，当 access_token 过期的时候调用 refresh 接口进行刷新
 - access_token 要带上 用户名 和 id，用户名用于数据库查找及账号对应密码验证
@@ -2740,148 +3376,73 @@ from 后的是左表，join 后的是右表。
 
 
 
+### 单 token 实现无感刷新
 
+原理：登录后返回 jwt，每次请求接口带上这个 jwt，然后**每次访问接口返回新的 jwt，然后前端更新下本地的 jwt token**。
 
-## 53、动态读取不同环境的配置
+注意：
 
-- node 里面通过 dotenv 包进行加载
+- 默认情况前端能访问的header 是有限的，如果想在代码访问别的 header，需要在后端支持下，在 Access-Controll-Expose-Headers 里加上这个 header
 
-  ```js
-  require('dotenv').config({
-      path: './.env',
-  })
-  console.log(process.env) 
-  ```
-
-  - 通过 NODE_ENVIRONMENT 环境变量来切换
-
-    ```js
-    require('dotenv').config({
-        path: process.env.NODE_ENVIRONMENT === 'production' ? '.production.env' : '.env',
-    })
-    
-    console.log('aaa', process.env.aaa);
-    console.log('bbb', process.env.bbb)
-    ```
-
-- 读取 yaml 格式的配置文件：js-yaml 包 
-
-  - 使用
-
-    ```js
-    const yaml = require('js-yaml');
-    const fs = require('fs');
-    
-    const config = fs.readFileSync('./hello.yaml');
-    console.log(yaml.load(config));
-    ```
-
-- Nest 里使用 @nestjs/config 包
-
-  - AppModule 里面引入：`imports: [ConfigModule.forRoot()]`，这里通过 forRoot 方法进行注册，如果不是全局模式则在其他Module 里不可用
-
-  - 使用
-
-    ```typescript
-    import { Controller, Get, Inject } from '@nestjs/common';
-    import { ConfigService } from '@nestjs/config';
-    import { AppService } from './app.service';
-    
-    @Controller()
-    export class AppController {
-      constructor(private readonly appService: AppService) {}
-    
-      @Inject(ConfigService)
-      private configService: ConfigService;
-    
-      @Get()
-      getHello() {
-        return {
-          aaa: this.configService.get('aaa'),
-          bbb: this.configService.get('bbb')
-        }
-      }
-    }
-    ```
-
-  - 加载多个配置文件（**前面的配置文件会覆盖后面**）
-
-    ```typescript
-    imports: [
-        ConfigModule.forRoot({
-          envFilePath: [path.join(process.cwd(), '.aaa.env'), path.join(process.cwd(), '.env')]
-        })
-    ],
-    ```
-
-  - 放在配置文件单独返回（config.ts）
-
-    ```typescript
-    // config.ts
-    export default async () => {
-        const dbPort = await 3306;
-    
-        return {
-            port: parseInt(process.env.PORT, 10) || 3000,
-            db: {
-              host: 'localhost',
-              port: dbPort
-            }
-        }
-    }
-    ```
-
-    ```typescript
-    // 引入
-    import config from "./config"
-    
-    ConfigModule({
-        load: [config]
-    })
-    // 使用方法同上
-    ```
-
-  - 加载 yaml 文件
-
-    ```yaml
-    # aaa.yaml
-    application:
-      host: 'localhost'
-      port: 8080
-    
-    aaa:
-      bbb:
-        ccc: 'ccc'
-        port: 3306
-    ```
-
-    ```typescript
-    // config.ts
-    import { readFile } from 'fs/promises';
-    import * as yaml from 'js-yaml';
-    import { join } from 'path';
-    
-    export default async () => {
-        const configFilePath = join(process.cwd(), 'aaa.yaml');
-        const config = await readFile(configFilePath);
-        return yaml.load(config);
-    };
-    
-    // 使用方法同上
-    ```
-
-- **注意：** 
-
-  1. ConfigModule.forRoot 注册为全局模块才能在其他 Module 中使用
-  2. 动态模块的 **forRoot** 用于 AppModule 里注册，一般指定为全局模块`(isGlobal: true)`
-  3. **forFeature** 用于局部配置，在不同模块里 **imports**
-  4. **register** 用于一次性的配置
+  <img src="./assets/Nest/d478babb56e14c5eaaca38aed3423f98tplv-k3u1fbpfcp-jj-mark3326000q75.webp" alt="img" style="zoom: 50%;" />  
 
 
 
 
 
-## 54、Docker Compose
+### passport 身份认证
+
+
+1. 安装三方库：`npm install --save @nestjs/passport passport`
+
+2. 用户名密码的认证:
+   - 安装三方库：`npm install --save passport-local npm install --save-dev **@types**/passport-local`
+   - 创建 local.strategy.ts ，实现 PassportStrategy 其中 **Strategy 从 request 取出一些东西，交给 validate 方法验证，validate 方法返回 user 信息，自动放到 request.user 上**，这里 validata 校验用户名密码是使用 authService 里面实现，如果抛出错误会被捕获，否则返回 user
+   - 使用时与Guard一样：`@UseGuards(AuthGuard('local'))`
+   ![image-20250113182746941](./assets/Nest/image-20250113182746941.png)  
+
+3. JWT认证
+   - 安装三方库：`@nestjs/jwt`，正常注入
+   
+   - 安装三方库：`npm install --save passport-jwt`、`npm install --save-dev @types/passport-jwt`
+   
+   - 使用 strategy 自动校验，指定从 request 的 header 里提取 token，然后取出 payload 之后会传入 validate 方法做验证，返回的值同样会设置到 request.user。
+   
+     ![image-20250114111350707](./assets/Nest/image-20250114111350707.png)  
+   
+   - **对 Guard 做拓展**
+   
+     这里使用 SetMetadata 在 handler 设置自定义标识，并在 Guard 中取到，判断之后是否使用 passport 进行校验
+   
+     ![image-20250114111825442](./assets/Nest/image-20250114111825442.png)  
+
+> [官网 passport 相关资料](https://docs.nestjs.com/recipes/passport#passport-authentication)
+
+
+
+### passport 实现 GitHub 登录
+
+Client ID：Ov23lio75TqliTycucCv
+
+Client secrets：4203d10911279edd49ae2c3a0b53deacc828eb74
+
+> [参考小册](https://juejin.cn/book/7226988578700525605/section/7374065442215854134?enter_from=course_center&utm_source=course_center)
+
+
+
+### passport 实现 Google 登录
+
+Client ID：51009918445-q0f028hert72c1vdcu0b7vpenjjgi6pc.apps.googleusercontent.com
+
+Client secrets：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
+
+> [参考小册](https://juejin.cn/book/7226988578700525605/section/7376480527337193482?enter_from=course_center&utm_source=course_center)
+
+
+
+## Docker Compose
+
+### 使用
 
 ```yaml
 services:
@@ -2912,13 +3473,21 @@ services:
 - depends_on 用于设置其他依赖的 services，会先启动这里设置的
 - 其他命令参考 Docker 章节
 
+- docker-compose xxx：运行，会把所有容器的日志合并输出。**新版本改为 docker compose xxx**
+
+只需要定义 docker-compose.yaml 来声明容器的顺序和启动方式，之后执行 docker-compose up 一条命令就能按照顺序启动所有的容器。
 
 
 
+### 桥接网络
 
-## 55、Docker — 桥接网络
+> 由于Docker 通过 Namespace 的机制实现了容器的隔离，其中就包括 Network Namespace。所以不能直接通过端口访问其他容器的服务。
+>
+> 上面通过将 docker 内的端口映射到宿主机，从而实现容器间的通信
+>
+> 这里可以通过创建一个 Network Namespace，设置多个 Docker 容器实现通信，即桥接网络
 
-- docker-compose 配置
+- 使用 docker-compose 配置桥接网络
 
   ```yaml
   version: '3.8'
@@ -2948,24 +3517,33 @@ services:
         - common-network
   networks:
     common-network:
-      driver: bridge
+      driver: bridge # 网络驱动程序指定 bridge
   ```
 
   - version 是指定 docker-compose.yml 的版本，因为不同版本配置不同。
   - mysql-container、redis-container 的 ports 映射去掉，指定桥接网络为 common-network。
+  - 网络驱动程序指定bridge的含义是容器的网络和宿主机网络是隔离开的，但是可以做端口映射。比如 -p 3000:3000、-p 3306:3306 这样。
   - `docker-compose down --rmi all` 删除所有容器和镜像
   - `docker-compose up` 启动
-  - 注意：这里不手动指定 networks 时，会创建默认的 network，同样可以使用桥接网络
+  - **注意**：这里不手动指定 networks 时，会创建默认的 network，同样可以使用桥接网络
 
-- docker 
+- 手动创建桥接网络并启动各个容器
 
-  - 通过 docker network create 创建一个桥接网络，然后 docker run 的时候指定 --network，这样 3 个容器就可以通过容器名互相访问了。
+  - 通过 `docker network create xxx` 创建一个桥接网络，
+  
+  - 然后 docker run 的时候指定 --network为创建的桥接网络，不需要指定和宿主机的端口映射：
+  
+    `docker run -d --network common-network -v C:\Users\Anony\Documents\MySQL\mysql-1:/var/lib/mysql --name mysql-container mysql  `
+  
+    `docker run -d --network common-network -v C:\Users\Anony\Documents\Redis\redis-1:/data --name redis-container redis:latest`
+  
+    `docker run -d --network common-network -p 3000:3000 --name nest-container imagename` 这里端口映射到宿主机进行网页访问
 
 
 
 
 
-## 56、重启策略
+### 重启策略
 
 - Docker：使用 --restart XXX，Docker Compose里也支持 restart 配置，重启策略有四种
 
@@ -2988,21 +3566,27 @@ services:
   CMD ["pm2-runtime", "/app/index.js"]
   ```
 
+- docker compose 重启
+
+  <img src="./assets/Nest/1c171bb5150949c5b1657523e6b96799tplv-k3u1fbpfcp-jj-mark3024000q75.webp" alt="img" style="zoom:50%;" />  
+
   
 
 
 
-## 57、快速掌握 Nginx
+## Nginx基础
+
+> nginxconfig.io NGINX 配置网站
 
 - 4个 location 语法
 
-  - location = /aaa 是精确匹配 /aaa 的路由。
+  - `location = /aaa` 是精确匹配 /aaa 的路由。
 
-  - location /bbb 是前缀匹配 /bbb 的路由。
+  - `location /bbb` 是前缀匹配 /bbb 的路由。
 
-  - location ~ /ccc.*.html 是正则匹配。可以再加个 * 表示不区分大小写 location ~* /ccc.*.html
+  - `location ~ /ccc.*.html` 是正则匹配。可以再加个 * 表示不区分大小写 location ~* /ccc.*.html
 
-  - location ^~ /ddd 是前缀匹配，但是优先级更高。
+  - `location ^~ /ddd` 是前缀匹配，但是优先级更高。`^~` 提高前缀匹配优先级
 
     ```nginx
     location = /111/ {
@@ -3033,9 +3617,9 @@ services:
 
   - 具体的路由配置一般放在 conf.d 里面
 
-- root 和 alias 区别：**拼接路径时是否包含匹配条件的路径**
+- root 和 alias 区别：**拼接路径时是否包含匹配条件的路径**，root 会进行拼接，alias 则不会
 
-  ![image-20230818144715285](./assets/Nest/image-20230818144715285.png)
+  ![image-20230818144715285](./assets/Nest/image-20230818144715285.png)  
 
 - 默认文件位置
 
@@ -3046,24 +3630,20 @@ services:
 - 正向代理 & 反向代理
 
   - 修改 header ： `proxy_set_header name zhangsan`
+  - 反向代理：`proxy_pass http://192.168.1.66:3000;`
 
 - 负载均衡
 
   - 在 upstream 里配置它代理的目标服务器的所有实例，**默认为轮询**
 
-    ```nginx
-    upstream nest-server {
-    	server 192.168.2.1:3001;
-    	server 192.168.2.1:3002;	
-    }
-    ```
-
+    <img src="./assets/Nest/b7e3ed96deaf4037a5aab7444ae98a3etplv-k3u1fbpfcp-jj-mark3024000q75.webp" alt="img" style="zoom:50%;" />  
+    
   - 4种负载均衡策略
-
+  
     - 轮询：默认方式。
-
+  
     - weight：在轮询基础上增加权重，也就是轮询到的几率不同。
-
+  
       ```nginx
       # 这样相当于两个服务器轮询到的几率为 2:1
       upstream nest-server {
@@ -3071,9 +3651,9 @@ services:
       	server 192.168.2.1:3002 weight=2; # 默认为 1	
       }
       ```
-
+  
     - ip_hash：按照 ip 的 hash 分配，保证每个访客的请求固定访问一个服务器，解决 session 问题。
-
+  
       ```nginx
       upstream nest-server {
           ip_hash;
@@ -3081,48 +3661,735 @@ services:
       	server 192.168.2.1:3002;	
       }
       ```
-
+  
     - fair：按照响应时间来分配，这个需要安装 nginx-upstream-fair 插件。
 
 
 
+## Nginx 实现灰度
+
+1. 设置多组 upstream 
+
+   ```nginx
+   upstream version1.0_server {
+       server 192.168.1.6:3000;
+   }
+    
+   upstream version2.0_server {
+       server 192.168.1.6:3001;
+   }
+   
+   upstream default {
+       server 192.168.1.6:3000;
+   }
+   ```
+
+2. 根据 cookie 设置转发到哪个 
+
+   如果包含 version=1.0 的 cookie，那就走 version1.0_server 的服务，有 version=2.0 的 cookie 就走 version2.0_server 的服务，否则，走默认的
+
+   ```nginx
+   set $group "default";
+   if ($http_cookie ~* "version=1.0"){
+       set $group version1.0_server;
+   }
+   
+   if ($http_cookie ~* "version=2.0"){
+       set $group version2.0_server;
+   }
+   
+   location ^~ /api {
+       rewrite ^/api/(.*)$ /$1 break;
+       proxy_pass http://$group;
+   }
+   ```
+
+3. 流量染色
+
+   比如随机数载 0 到 0.2 之间，就设置 version=2.0 的 cookie，否则，设置 version=1.0 的 cookie。
+
+   <img src="./assets/Nest/60249ce21c284c928086815fec6801e9tplv-k3u1fbpfcp-jj-mark3024000q75.webp" alt="img" style="zoom: 50%;" />  
+
+   其中，后端代码会根据 cookie 标识来请求不同的服务（或者同一个服务走不同的 if else），前端代码可以根据 cookie 判断走哪段逻辑。
 
 
-## 58、基于 Redis 实现分布式 session  
+
+## 基于 Redis 实现分布式 session  
+
+> 实现代码：redis-session-test
+
+<img src="./assets/Nest/c92708cac3374e99a3e4a813bcfe7fe3tplv-k3u1fbpfcp-jj-mark3024000q75.webp" alt="img" style="zoom:50%;" />  
 
 - 思路：将用户数据保存在同一个 Redis 里面，当通过不同的服务器进行登陆时，都使用这一个 Redis 进行数据查询
 
+**redis 的 hash 方法：**
+
+- `HSET key field value`： 设置指定哈希表 key 中字段 field 的值为 value。
+- `HGET key field`：获取指定哈希表 key 中字段 field 的值。
+- `HMSET key field1 value1 field2 value2 ...`：同时设置多个字段的值到哈希表 key 中。
+- `HMGET key field1 field2 ...`：同时获取多个字段的值从哈希表 key 中。
+- `HGETALL key`：获取哈希表 key 中所有字段和值。
+- `HDEL key field1 field2 ...`：删除哈希表 key 中一个或多个字段。
+- `HEXISTS key field`：检查哈希表 key 中是否存在字段 field。
+- `HKEYS key`：获取哈希表 key 中的所有字段。
+- `HVALUES key`：获取哈希表 key 中所有的值。 -`HLEN key`：获取哈希表 key 中字段的数量。
+- `HINCRBY key field increment`：将哈希表 key 中字段 field 的值增加 increment。
+- `HSETNX key field value`：只在字段 field 不存在时，设置其值为 value。
+
+
+
+## 基于 Redis GEO 数据实现附近查找功能
+
+> [掘金小册](https://juejin.cn/book/7226988578700525605/section/7284426518866952232?enter_from=course_center&utm_source=course_center)
+>
+> 代码地址：Projects -> nearby-search
 
 
 
 
-## 59、Swagger 自动生成 API 文档
 
-需要先安装 @nestjs/swagger 的包。
+## Swagger 自动生成 API 文档
 
-然后在 main.ts 里用 DocumentBuilder + SwaggerModule.createDocuemnt 创建 swagger 文档配置，然后 setup 跑起来就好了。
+> [掘金小册](https://juejin.cn/book/7226988578700525605/section/7236527474316673085?enter_from=course_center&utm_source=course_center)
+
+1. 安装Swagger 包 `npm install --save @nestjs/swagger`
+
+2. 在 main.ts 里用 DocumentBuilder + SwaggerModule.createDocuemnt 创建 swagger 文档配置
+
+   ```js
+   import { NestFactory } from '@nestjs/core';
+   import { AppModule } from './app.module';
+   import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+   
+   async function bootstrap() {
+     const app = await NestFactory.create(AppModule);
+   
+     const config = new DocumentBuilder()
+       .setTitle('NestJS Test')
+       .setDescription('NestJS API')
+       .setVersion('1.0')
+       .addTag('Test')
+       .build();
+   
+     const document = SwaggerModule.createDocument(app, config);
+     SwaggerModule.setup('doc', app, document);
+   
+     await app.listen(process.env.PORT ?? 3000);
+   }
+   bootstrap();
+   ```
+
+   配置对应关系
+
+   ![img](./assets/Nest/945dc014c5984efb9736936dc06507b8tplv-k3u1fbpfcp-jj-mark3024000q75.webp)  
 
 还需要手动加一些装饰器来标注：
 
 - ApiOperation：声明接口信息
+
 - ApiResponse：声明响应信息，一个接口可以多种响应
+
 - ApiQuery：声明 query 参数信息
+
+  ![image-20250121162112250](./assets/Nest/image-20250121162112250.png)  
+
 - ApiParam：声明 param 参数信息
+
 - ApiBody：声明 body 参数信息，可以省略
+
 - ApiProperty：声明 dto、vo 的属性信息
+
+  ```ts
+  import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+  
+  export class CccDto {
+      @ApiProperty({ name: 'aaa', enum: ['a1', 'a2', 'a3'], maxLength: 30, minLength: 2, required: true})
+      aaa: string;
+  
+      @ApiPropertyOptional({ name: 'bbb', maximum: 60, minimum: 40, default: 50, example: 55})
+      bbb: number;
+  
+      @ApiProperty({ name: 'ccc' })
+      ccc: Array<string>;
+  }
+  ```
+
 - ApiPropertyOptional：声明 dto、vo 的属性信息，相当于 required: false 的 ApiProperty
+
 - ApiTags：对接口进行分组
+
 - ApiBearerAuth：通过 jwt 的方式认证，也就是 Authorization: Bearer xxx
+
 - ApiCookieAuth：通过 cookie 的方式认证
+
 - ApiBasicAuth：通过用户名、密码认证，在 header 添加 Authorization: Basic xxx
 
 swagger 是 openapi 标准的实现，可以在 url 后加个 -json 拿到对应的 json，然后导入别的接口文档平台来用。
 
 
 
+## 灵活创建 DTO
+
+使用 @nestjs/mapped-types 的 PartialType、PickType、OmitType、IntersectionType 来避免重复。
+
+- **PickType** 是从已有 dto 类型中取某个字段。
+
+- **OmitType** 是从已有 dto 类型中去掉某个字段。
+
+- **PartialType** 是把 dto 类型变为可选。
+
+- **IntersectionType** 是组合多个 dto 类型。
+
+组合使用
+
+<img src="./assets/Nest/image-20250205152829143.png" alt="image-20250205152829143" style="zoom: 67%;" />    
 
 
-## 60、Node 发送邮件
 
 
 
+## class-validator 内置装饰器及自定义装饰器
+
+### 内置校验规则
+
+> [class-validator文档](https://www.npmjs.com/package/class-validator#validation-decorators)
+
+- **@IsEmail**：邮箱
+- **@IsOptional**：可选
+- **@IsIn**：限制只能是某些值：`@IsIn(['aaa@aa.com', 'bbb@bb.com'])`
+- **@IsNotIn**：限制不能是某些值
+
+数组：
+
+- **@IsArray** ：限制属性是 array
+- **@ArrayContains**：指定数组里必须包含的值：`@ArrayContains(['1', '2', '3'], { message: 'aaa 必须包含 1 2 3' })`
+- **@ArrayNotContains**：必须不包含的值
+- **@ArrayMinSize** 和 **@ArrayMaxSize** 限制数组的长度
+- **@ArrayUnique**： 限制数组元素必须唯一
+
+空值：
+
+- **@IsNotEmpty**：不能为空
+
+- **@IsNotEmpty**： 检查值是不是 ''、undefined、null
+- **@IsDefined**：检查值是不是 undefined、null
+
+数字：
+
+- **@IsPositive**：必须是正数
+- **@IsNegative**：必须是负数
+- **@Min**、**@Max**：限制范围
+- **@IsDivisibleBy**：必须被某个数整除
+
+字符串：
+
+- **@IsString**：字符串
+- **@IsAlpha**：检查是否只有字母
+- **@IsAlphanumeric**：检查是否只有字母和数字
+- **@Contains**：是否包含某个值
+- **@MinLength**、**@MaxLength** / **@Length**：限制长度
+
+颜色：
+
+- **@IsHexColor**、**@IsHSL**、**@IsRgbColor**
+
+其他：
+
+- **@IsDateString**：ISO 标准的日期字符串
+
+  <img src="./assets/Nest/b35e18bb026a47089a3d7e3f4275ba80tplv-k3u1fbpfcp-jj-mark3024000q75.webp" alt="img" style="zoom:50%;" />  
+
+- **@IsIP**：校验 IP 的格式
+
+- **@IsPort**：校验端口
+
+- **@IsJSON**：校验 JSON 格式
+
+- 如果某个属性是否校验要根据别的属性的值
+
+  ```ts
+  @IsBoolean()
+  hhh: boolean;
+  
+  @ValidateIf(o => o.hhh === true) // 如果 hhh 传了 true，那就需要对 iii 做校验，否则不需要。
+  @IsNotEmpty()
+  @IsHexColor()
+  iii: string;
+  ```
+
+
+
+### 自定义校验规则
+
+1. 创建：
+
+   - 用 @ValidatorConstraint 声明 class 为校验规则，然后实现 ValidatorConstraintInterface 接口。
+
+   - 如果这个校验是异步的返回 promise 就行了
+
+   ```ts
+   import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
+   
+   @ValidatorConstraint()
+   export class MyValidator implements ValidatorConstraintInterface {
+       validate(text: string, validationArguments: ValidationArguments) {
+           console.log(text, validationArguments)
+           return true;
+       }
+   }
+   ```
+
+2. 使用：第一个参数传入的字段值，第二个参数包含更多信息，比如 @Validate 指定的参数在 constraints 数组里。
+
+   这样，我们只要用这些做下校验然后返回 true、false 就好了。
+
+   ```ts
+   @Validate(MyValidator, [11, 22], {
+       message: 'jjj 校验失败',
+   })
+   jjj: string;
+   ```
+
+3. 使用自定义装饰器包装一下
+
+   ```ts
+   import { applyDecorators } from '@nestjs/common';
+   import { Validate, ValidationOptions } from 'class-validator';
+   import { MyValidator } from './my-validator';
+   
+   export function MyContains(content: string, options?: ValidationOptions) {
+     return applyDecorators(
+        Validate(MyValidator, [content], options)
+     )
+   }
+   ```
+
+   - 用 applyDecorators 组合装饰器生成新的装饰器
+
+   - 使用
+
+     ```ts
+     @MyContains('111', {
+         message: 'jjj 必须包含 111'
+     })
+     jjj: string;
+     ```
+
+
+
+
+
+## 序列化 Entity
+
+![img](./assets/Nest/dd019321aad2433db52a5a5fe537e457tplv-k3u1fbpfcp-jj-mark3024000q75.webp)
+
+### 使用 vo 对象
+
+1. 创建 vo/user.vo.ts：
+
+   ```ts
+   export class UserVo {
+       id: number;
+   
+       username: string;
+   
+       email: string;
+   
+       constructor(partial: Partial<UserVo>) {
+           Object.assign(this, partial);
+       }
+   }
+   ```
+
+2. 然后把数据封装成 vo 返回
+
+   ```ts
+   findAll() {
+       return database.map(item => {
+         return new UserVo({
+           id: item.id,
+           username: item.username,
+           email: item.email
+         });
+       });
+   }
+   
+   findOne(id: number) {
+       return database.filter(item =>  item.id === id).map(item => {
+         return new UserVo({
+           id: item.id,
+           username: item.username,
+           email: item.email
+         });
+       }).at(0);
+   }
+   ```
+
+   
+
+### 复用 Dto
+
+1. 安装用到的包：`npm install --save class-transformer`
+
+2. 在 entity 上添加装饰器，然后在 Controller 的查询方法上加上 ClassSerializerInterceptor 就好了
+
+   ![image-20250208135911630](./assets/Nest/image-20250208135911630.png)
+
+   此时接口返回值即可排除 password 字段
+   
+   - **@Expose** 是添加一个导出的字段，这个字段是只读的。
+   - **@Transform** 是对返回的字段值做一些转换。
+   - <img src="./assets/Nest/image-20250208140204927.png" alt="image-20250208140204927" style="zoom:50%;" />  
+
+3. 此外，可以通过 @SerializeOptions 装饰器加一些序列化参数：
+
+   <img src="./assets/Nest/39a63ab89e6d43be8a9f4b63b79dc29btplv-k3u1fbpfcp-jj-mark3024000q75.webp" alt="img" style="zoom:50%;" />  
+
+   - strategy 默认值是 exposeAll，全部导出，除了有 @Exclude 装饰器的
+
+   - 设置为 excludeAl 就是全部排除，除了有 @Expose 装饰器的
+
+   - ClassSerializerInterceptor 和 SerializeOptions 也可以加到 class 上
+
+### 结合 swagger 使用
+
+1. swagger 使用见上
+
+2. @apiResponse 里就可以直接指定 User 的 entity
+
+   <img src="./assets/Nest/d6b8c51901bc480cb552318d27dae5a3tplv-k3u1fbpfcp-jj-mark3024000q75.webp" alt="img" style="zoom:50%;" />  
+
+3. 在 User 里加一下 swagger 的装饰器：（使用 ApiHide）
+
+   <img src="./assets/Nest/f0df788a9c8e47538c5960bbaa7e086etplv-k3u1fbpfcp-jj-mark3024000q75.webp" alt="img" style="zoom:50%;" />  
+
+
+
+
+
+## 使用 compodoc  生成文档
+
+> 当项目复杂之后，模块之间的关系错综复杂，使用 compodoc  生成文档，把依赖关系可视化
+
+1. 安装：`npm install --save-dev @compodoc/compodoc`
+
+2. 生成文档：`npx @compodoc/compodoc -p tsconfig.json -s -o`
+
+   - -p 是指定 tsconfig 文件
+
+   - -s 是启动静态服务器
+
+   - -o 是打开浏览器
+   -  [compodoc 文档](https://link.juejin.cn/?target=https%3A%2F%2Fcompodoc.app%2Fguides%2Foptions.html)
+
+3. 配置文件 .compodoc.json
+
+   ```json
+   {
+       "port": 8888,
+       "theme": "postmark"
+   }
+   ```
+
+   运行：`npx @compodoc/compodoc -p tsconfig.json -s -o -c .compodoc.json`
+
+
+
+
+
+## Node发送邮件
+
+- 发邮件用 SMTP 协议。收邮件用 POP3 协议、或者 IMAP 协议。
+
+- 发送邮件
+
+  ```js
+  import * as nodemailer from 'nodemailer';
+  import * as fs from 'fs';
+  
+  const transporter = nodemailer.createTransport({
+      host: "smtp.163.com",
+      port: 25,
+      secure: false,
+      auth: {
+          user: 'anony2s@163.com',
+          pass: 'YNi4ZqufYQrVmu4m'
+      },
+  });
+  
+  async function main() {
+    const info = await transporter.sendMail({
+      from: '"Anony" anony2s@163.com',
+      to: "ljx1583861@qq.com",
+      subject: "测试邮件", 
+      html: fs.readFileSync('./bird.html')
+    });
+  
+    console.log("邮件发送成功：", info.messageId);
+  }
+  
+  main().catch(console.error);
+  ```
+
+- 接收邮件
+
+  ```js
+  import Imap from 'imap';
+  import { MailParser } from 'mailparser';
+  import path from 'path';
+  import * as fs from 'fs';
+  
+  const imap = new Imap({
+    user: 'anony2s@163.com',
+    password: 'YNi4ZqufYQrVmu4m',
+    host: 'imap.163.com',
+    port: 993,
+    tls: true
+  });
+  
+  imap.once('ready', () => {
+    // 发送客户端身份信息
+    imap.id({ name: 'my-client', version: '1.0.0', vendor: 'my-company', "support-email": "test@163.com" }, (err) => {
+      if (err) {
+        console.error('Failed to send ID:', err);
+        return;
+      }
+  
+      // 打开邮箱
+      imap.openBox('INBOX', true, (err, box) => {
+        if (err) {
+          console.error('Failed to open mailbox:', err);
+          return;
+        }
+  
+        // 搜索邮件
+        imap.search([['SEEN'], ['SINCE', new Date('2022-12-19 19:00:00').toLocaleString()]], (err, results) => {
+          if (err) {
+            console.error('Search error:', err);
+            return;
+          }
+  
+          console.log('Search results:', results);
+  
+          // 处理邮件
+          results.forEach((uid) => {
+            const fetch = imap.fetch(uid, { bodies: '' });
+  
+            fetch.on('message', (msg) => {
+              const mailParser = new MailParser();
+  
+              msg.on('body', (stream) => {
+                stream.pipe(mailParser);
+              });
+  
+              mailParser.on('data', (data) => {
+                if (data.type === 'text') {
+                  console.log('Text body:', data.text);
+                } else if (data.type === 'attachment') {
+                  const filePath = path.join(__dirname, data.filename);
+                  data.content.pipe(fs.createWriteStream(filePath));
+                  data.release();
+                }
+              });
+  
+              mailParser.on('end', () => {
+                console.log('Finished processing email');
+              });
+            });
+  
+            fetch.on('error', (err) => {
+              console.error('Fetch error:', err);
+            });
+          });
+        });
+      });
+    });
+  });
+  
+  imap.once('error', (err) => {
+    console.error('IMAP error:', err);
+  });
+  
+  imap.once('end', () => {
+    console.log('Connection ended');
+  });
+  
+  imap.connect();
+  ```
+
+  注意 163 邮箱需要发送客户端身份信息，邮箱设置打开 收取全部邮件 才能查找到历史邮件
+
+
+
+
+
+## Nest 定时任务
+
+### @nestjs/schedule
+
+1. 安装：`npm i @nestjs/schedule`
+
+2. 引用
+
+   <img src="./assets/Nest/image-20250210183040849.png" alt="image-20250210183040849" style="zoom:67%;" />  
+
+3. 使用
+
+   <img src="./assets/Nest/image-20250210183118373.png" alt="image-20250210183118373" style="zoom: 67%;" />  
+
+注意：Nodejs 版本 >= 20
+
+- **@Cron**：
+
+  - 指定定时任务的名字，还有时区
+
+    <img src="./assets/Nest/image-20250211155951811.png" alt="image-20250211155951811" style="zoom:67%;" />
+
+    时区的名字可以在[这里](https://link.juejin.cn/?target=https%3A%2F%2Fmomentjs.com%2Ftimezone%2F)查
+
+- **@Interval**：指定任务的执行间隔，参数是毫秒值
+  
+  <img src="./assets/Nest/image-20250211160311965.png" alt="image-20250211160311965" style="zoom:50%;" />  
+  
+- **@Timeout**：指定多长时间后执行一次
+  
+  ```js
+  @Timeout('task3', 3000)
+  task3() {
+      console.log('task3');
+  }
+  ```
+  
+- **Cron 使用**：
+
+​		<img src="./assets/Nest/f92a440ff82e4d34971c5216ae91afd7tplv-k3u1fbpfcp-jj-mark3024000q75.webp" alt="img" style="zoom: 50%;" />  
+
+[其他用法](https://juejin.cn/book/7226988578700525605/section/7271574633512435747?enter_from=course_center&utm_source=course_center)
+
+
+
+### 管理定时任务
+
+1. 在 AppModule 里注入 SchedulerRegistry，然后在 onApplicationBootstrap 的声明周期里拿到所有的 cronJobs
+
+   ```js
+   @Module({
+     imports: [ScheduleModule.forRoot()],
+     controllers: [AppController],
+     providers: [AppService, TaskService],
+   })
+   export class AppModule implements OnApplicationBootstrap { // 这里实现 OnApplicationBootstrap 拿到生命周期
+     @Inject(SchedulerRegistry)
+     private schedulerRegistry: SchedulerRegistry;
+   
+     onApplicationBootstrap() {
+       const jods = this.schedulerRegistry.getCronJobs();
+       console.log(jods);
+     }
+   }
+   ```
+
+2. 拿到所有的定时任务及具体的定时任务
+
+   ```js
+   // interval 定时任务
+   this.schedulerRegistry.getIntervals()
+   this.schedulerRegistry.getInterval('task2')
+   
+   // timeout 定时任务
+   this.schedulerRegistry.getTimeouts();
+   this.schedulerRegistry.getTimeout('task3')
+   
+   // cron 定时任务
+   this.schedulerRegistry.getTimeouts();
+   this.schedulerRegistry.getTimeout('task3')
+   ```
+
+3. 增加 / 删除定时任务
+
+   ```js
+   onApplicationBootstrap() {
+       const crons = this.schedulerRegistry.getCronJobs();
+       crons.forEach((item, key) => {
+         item.stop(); // 注意这里停止 cron 任务 和 timeout 任务的方式是不一样的
+         this.schedulerRegistry.deleteCronJob(key);
+       });
+   
+       const intervals = this.schedulerRegistry.getIntervals();
+       intervals.forEach((item) => {
+         const interval = this.schedulerRegistry.getInterval(item);
+         clearInterval(interval);
+   
+         this.schedulerRegistry.deleteInterval(item);
+       });
+   
+       const timeouts = this.schedulerRegistry.getTimeouts();
+       timeouts.forEach((item) => {
+         const timeout = this.schedulerRegistry.getTimeout(item);
+         clearTimeout(timeout);
+   
+         this.schedulerRegistry.deleteTimeout(item);
+       });
+   
+       console.log(this.schedulerRegistry.getCronJobs());
+       console.log(this.schedulerRegistry.getIntervals());
+       console.log(this.schedulerRegistry.getTimeouts());
+   
+       // 这里需要安装 cron 并 import { CronJob } from 'cron';
+       const job = new CronJob(`0/5 * * * * *`, () => {
+         console.log('cron job');
+       });
+       
+       this.schedulerRegistry.addCronJob('job1', job);
+       job.start();
+       
+       const interval = setInterval(() => {
+         console.log('interval job')
+       }, 3000);
+       this.schedulerRegistry.addInterval('job2', interval);
+       
+       const timeout = setTimeout(() => {
+         console.log('timeout job');
+       }, 5000);
+       this.schedulerRegistry.addTimeout('job3', timeout);
+     }
+   ```
+
+
+
+
+
+## Nest 事件通信
+
+> 多个业务模块之间可能会有互相调用的关系，但是也不方便直接注入别的业务模块的 Service 进来。
+>
+> 这种就可以通过 EventEmitter 来实现。
+>
+> 在一个 service 里 emit 事件和 data，另一个 service 里 @OnEvent 监听这个事件就可以了。
+
+1. 安装：`npm i --save @nestjs/event-emitter`
+
+2. AppModule 引入下 EventEmitterModule
+
+   ```ts
+   @Module({
+     imports: [
+       EventEmitterModule.forRoot(),
+     ],
+     controllers: [AppController],
+     providers: [AppService],
+   })
+   export class AppModule {}
+   ```
+
+3. 在一个模块中使用emit发送一个事件，另一个模块中监听事件
+
+   AaaService 中调用 findAll 时会自动触发 BbbService 中的方法
+
+   ![image-20250211171416041](./assets/Nest/image-20250211171416041.png)
+
+   另外支持一些配置，可以同时发送多个事件
+
+   - **wildcard** 是允许通配符 *
+
+   - **delimiter** 是 namespace 和事件名的分隔符	![image-20250211172141044](./assets/Nest/image-20250211172141044.png)  
